@@ -11,6 +11,7 @@ import ContactUs from "./Components/ContactUs";
 import RefundPolicy from "./Components/RefundPolicy";
 import FAQ from "./Components/FAQ";
 import Products from "./Components/Products";
+import Cart from "./Components/Cart";
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
         <Route path="contact" element={<ContactUs />}></Route>
         <Route path="refund" element={<RefundPolicy />}></Route>
         <Route path="faq" element={<FAQ />}></Route>
+        <Route path="cart" element={<Cart />}></Route>
       </Routes>
       <Footer />
     </BrowserRouter>

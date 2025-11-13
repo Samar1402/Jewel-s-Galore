@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Import product images
@@ -10,7 +10,14 @@ import giftHam from "../assets/giftHam.jpg";
 
 const Products = () => {
   const navigate = useNavigate();
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    const saved = localStorage.getItem("cart");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   const products = [
     { id: 1, name: "Pendants", price: 999, image: pendantImg },
@@ -23,9 +30,32 @@ const Products = () => {
     { id: 5, name: "Gift Hamper", price: 1499, image: giftHam },
   ];
 
-  const handleAddToCart = (item) => {
-    setCart((prev) => [...prev, item]);
-    alert(`${item.name} added to cart!`);
+  const handleIncrease = (item) => {
+    setCart((prev) => {
+      const existing = prev.find((p) => p.id === item.id);
+      if (existing) {
+        return prev.map((p) =>
+          p.id === item.id ? { ...p, quantity: p.quantity + 1 } : p
+        );
+      } else {
+        return [...prev, { ...item, quantity: 1 }];
+      }
+    });
+  };
+
+  const handleDecrease = (id) => {
+    setCart((prev) =>
+      prev
+        .map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
+
+  const getQuantity = (id) => {
+    const found = cart.find((item) => item.id === id);
+    return found ? found.quantity : 0;
   };
 
   return (
@@ -48,7 +78,7 @@ const Products = () => {
               <img
                 src={item.image}
                 alt={item.name}
-                className="h-64 w-full object-cover"
+                className="h-64 w-full object-cover cursor-pointer"
                 onClick={() => navigate(`/product/${item.name.toLowerCase()}`)}
               />
               <div className="p-4 text-center">
@@ -56,12 +86,24 @@ const Products = () => {
                   {item.name}
                 </h2>
                 <p className="text-gray-500 mb-3">₹{item.price}</p>
-                <button
-                  onClick={() => handleAddToCart(item)}
-                  className="bg-gray-900 text-white px-4 py-2 rounded-full hover:bg-gray-700 transition"
-                >
-                  Add to Cart
-                </button>
+
+                <div className="flex items-center justify-center gap-4">
+                  <button
+                    onClick={() => handleDecrease(item.id)}
+                    className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 transition"
+                  >
+                    –
+                  </button>
+                  <span className="font-semibold text-gray-800">
+                    {getQuantity(item.id)}
+                  </span>
+                  <button
+                    onClick={() => handleIncrease(item)}
+                    className="px-3 py-1 bg-gray-900 text-white rounded hover:bg-gray-700 transition"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -82,7 +124,7 @@ const Products = () => {
               <img
                 src={item.image}
                 alt={item.name}
-                className="h-64 w-full object-cover"
+                className="h-64 w-full object-cover cursor-pointer"
                 onClick={() =>
                   navigate(`/gift-hamper/${item.name.toLowerCase()}`)
                 }
@@ -92,40 +134,29 @@ const Products = () => {
                   {item.name}
                 </h2>
                 <p className="text-gray-500 mb-3">₹{item.price}</p>
-                <button
-                  onClick={() => handleAddToCart(item)}
-                  className="bg-gray-900 text-white px-4 py-2 rounded-full hover:bg-gray-700 transition"
-                >
-                  Add to Cart
-                </button>
+
+                <div className="flex items-center justify-center gap-4">
+                  <button
+                    onClick={() => handleDecrease(item.id)}
+                    className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 transition"
+                  >
+                    –
+                  </button>
+                  <span className="font-semibold text-gray-800">
+                    {getQuantity(item.id)}
+                  </span>
+                  <button
+                    onClick={() => handleIncrease(item)}
+                    className="px-3 py-1 bg-gray-900 text-white rounded hover:bg-gray-700 transition"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-
-      {/* Simple Cart Summary */}
-      {cart.length > 0 && (
-        <div className="mt-16 bg-gray-100 rounded-xl p-6 max-w-3xl mx-auto shadow-inner">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800 text-center">
-            🛒 Your Cart ({cart.length} items)
-          </h2>
-          <ul className="divide-y divide-gray-300">
-            {cart.map((item, index) => (
-              <li
-                key={index}
-                className="flex justify-between py-2 text-gray-700"
-              >
-                <span>{item.name}</span>
-                <span>₹{item.price}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="text-right mt-4 font-semibold text-gray-800">
-            Total: ₹{cart.reduce((sum, i) => sum + i.price, 0)}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
