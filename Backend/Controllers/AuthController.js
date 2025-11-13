@@ -1,5 +1,39 @@
+const jwt = require('jsonwebtoken')
 const UserModel = require("../Models/user");
 const bcrypt = require('bcrypt')
+
+const login = async(req,res)=>{
+    try{
+        const { email, password } = req.body;
+        const user =await UserModel.findOne({email});
+        const errMsg = "Auth failed email or password is wrong!" 
+        if (!user){
+            return res.status(403)
+                .json({message: errMsg, sucess: false})
+        }
+        const isPassEqual = await bcrypt.compare(password, user.password);
+        if (!isPassEqual){
+            return res.status(403)
+                .json({message: errMsg, sucess: false})
+        }
+        const jwtToken = jwt.sign(
+            { email: user.email, _id: user.id },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        )
+
+        res.status(200)
+        .json({
+            message: "Login Success", 
+            sucess: true,
+            jwtToken,
+            email,
+            name: user.name
+        })
+    }catch(err){
+        res.status(500).json({message: "Internal Server Error", sucess: false})
+    }
+}
 
 const signup = async(req,res)=>{
     try{
@@ -18,6 +52,8 @@ const signup = async(req,res)=>{
         res.status(500).json({message: "Internal Server Error", sucess: false})
     }
 }
+
 module.exports = {
-    signup
+    signup,
+    login
 }
