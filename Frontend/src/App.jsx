@@ -12,6 +12,10 @@ import RefundPolicy from "./Components/RefundPolicy";
 import FAQ from "./Components/FAQ";
 import Products from "./Components/Products";
 import Cart from "./Components/Cart";
+import Dashboard from "./pages/Dashboard";
+import OrderHistory from "./pages/OrderHistory";
+import Profile from "./pages/Profile";
+import Address from "./pages/Address";
 
 const App = () => {
   return (
@@ -28,6 +32,10 @@ const App = () => {
         <Route path="refund" element={<RefundPolicy />}></Route>
         <Route path="faq" element={<FAQ />}></Route>
         <Route path="cart" element={<Cart />}></Route>
+        <Route path="dashboard" element={<Dashboard/>}></Route>
+        <Route path="profile" element={<Profile/>}></Route>
+        <Route path="orders" element={<OrderHistory/>}></Route>
+        <Route path="address" element={<Address/>}></Route>
       </Routes>
       <Footer />
     </BrowserRouter>
