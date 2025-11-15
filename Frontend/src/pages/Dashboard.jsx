@@ -34,7 +34,7 @@ const Dashboard = () => {
           {/* Orders Card */}
           <div
             className="flex flex-col items-center p-6 bg-white rounded-xl shadow-lg hover:shadow-2xl transition duration-300 cursor-pointer"
-            onClick={() => navigate("/order-history")}
+            onClick={() => navigate("/orders")}
           >
             <FaShoppingCart className="text-5xl text-[#b8860b] mb-4" />
             <h2 className="text-xl font-semibold mb-1">Orders</h2>

@@ -1,8 +1,12 @@
 import React from "react";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { useAuth } from "../Context/AuthContext";
+import UserLayout from "../Layout/UserLayout";
 
 const ContactUs = () => {
-  return (
+  const { user } = useAuth();
+
+  const content = (
     <div className="min-h-screen flex items-center justify-center bg-white p-6">
       <div className="w-full max-w-4xl bg-white border border-gray-200 rounded-2xl shadow-2xl p-10">
         {/* Title */}
@@ -97,6 +101,14 @@ const ContactUs = () => {
       </div>
     </div>
   );
+
+  // If logged in → show with sidebar
+  if (user) {
+    return <UserLayout>{content}</UserLayout>;
+  }
+
+  // If not logged in → show normally
+  return content;
 };
 
 export default ContactUs;

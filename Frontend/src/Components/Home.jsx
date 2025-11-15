@@ -1,15 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
+import UserLayout from "../Layout/UserLayout"; 
+
 import mainImage from "../assets/Main_Image.jpg";
 import giftHam from "../assets/giftHam.jpg";
 
-// Products
 import pendantImg from "../assets/pendant.jpg";
 import earringImg from "../assets/earring.jpg";
 import braceletImg from "../assets/bracelet.jpg";
 import ringImg from "../assets/ring.jpg";
 
 const Home = () => {
+  const { user } = useAuth();
+
   const giftHampers = [{ name: "Gift Hamper", image: giftHam }];
 
   const products = [
@@ -19,7 +23,8 @@ const Home = () => {
     { name: "Rings", image: ringImg },
   ];
 
-  return (
+  // ⭐ Home UI Content (separated for reuse)
+  const HomeContent = (
     <div className="w-full mt-8 mb-8 bg-white">
       {/* Hero Section */}
       <div
@@ -92,6 +97,9 @@ const Home = () => {
       </div>
     </div>
   );
+
+  // ⭐ If logged-in → show sidebar + shift content right
+  return user ? <UserLayout>{HomeContent}</UserLayout> : HomeContent;
 };
 
 export default Home;

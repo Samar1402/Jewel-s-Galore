@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
+import UserLayout from "../Layout/UserLayout";
 
-// Import product images
 import pendantImg from "../assets/pendant.jpg";
 import earringImg from "../assets/earring.jpg";
 import braceletImg from "../assets/bracelet.jpg";
@@ -10,6 +11,8 @@ import giftHam from "../assets/giftHam.jpg";
 
 const Products = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem("cart");
     return saved ? JSON.parse(saved) : [];
@@ -27,10 +30,16 @@ const Products = () => {
   ];
 
   const giftHampers = [
-    { id: 5, name: "Gift Hamper", price: 1499, image: giftHam },
+    { id: 5, name: "Gift Hamper", price: 1199, image: giftHam },
   ];
 
   const handleIncrease = (item) => {
+    if (!user) {
+      alert("Please login first!");
+      navigate("/login");
+      return;
+    }
+
     setCart((prev) => {
       const existing = prev.find((p) => p.id === item.id);
       if (existing) {
@@ -44,6 +53,12 @@ const Products = () => {
   };
 
   const handleDecrease = (id) => {
+    if (!user) {
+      alert("Please login first!");
+      navigate("/login");
+      return;
+    }
+
     setCart((prev) =>
       prev
         .map((item) =>
@@ -58,7 +73,7 @@ const Products = () => {
     return found ? found.quantity : 0;
   };
 
-  return (
+  const content = (
     <div className="bg-white w-full min-h-screen py-12 px-6">
       <h1 className="text-4xl font-bold text-gray-800 text-center mb-12">
         Our Collection
@@ -66,9 +81,12 @@ const Products = () => {
 
       {/* Products Section */}
       <div className="mb-16">
-        <h2 className="text-3xl font-semibold text-gray-800 mb-8 text-center">
+        <h2 className="text-3xl font-semibold text-gray-800 mb-8">
           Products
+          <hr className="border-t-2 border-gray-300 my-2" />
         </h2>
+        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {products.map((item) => (
             <div
@@ -94,9 +112,11 @@ const Products = () => {
                   >
                     –
                   </button>
+
                   <span className="font-semibold text-gray-800">
                     {getQuantity(item.id)}
                   </span>
+
                   <button
                     onClick={() => handleIncrease(item)}
                     className="px-3 py-1 bg-gray-900 text-white rounded hover:bg-gray-700 transition"
@@ -112,8 +132,9 @@ const Products = () => {
 
       {/* Gift Hampers Section */}
       <div>
-        <h2 className="text-3xl font-semibold text-gray-800 mb-8 text-center">
+        <h2 className="text-3xl font-semibold text-gray-800 mb-8">
           Gift Hampers
+          <hr className="border-t-2 border-gray-300 my-2" />
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {giftHampers.map((item) => (
@@ -142,9 +163,11 @@ const Products = () => {
                   >
                     –
                   </button>
+
                   <span className="font-semibold text-gray-800">
                     {getQuantity(item.id)}
                   </span>
+
                   <button
                     onClick={() => handleIncrease(item)}
                     className="px-3 py-1 bg-gray-900 text-white rounded hover:bg-gray-700 transition"
@@ -159,6 +182,12 @@ const Products = () => {
       </div>
     </div>
   );
+
+  if (user) {
+    return <UserLayout>{content}</UserLayout>;
+  }
+
+  return content;
 };
 
 export default Products;

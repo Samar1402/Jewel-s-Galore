@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
+import UserLayout from "../Layout/UserLayout";
+import { useAuth } from "../Context/AuthContext";
 
 const Cart = () => {
+  const { user } = useAuth(); // check login
   const [cart, setCart] = useState([]);
 
-  // ✅ Load cart from localStorage
+  // Load cart from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("cart");
     if (saved) setCart(JSON.parse(saved));
   }, []);
 
-  // ✅ Update quantity (+ / -)
+  // Update quantity
   const updateQuantity = (id, change) => {
     const updatedCart = cart
       .map((item) =>
@@ -20,7 +23,7 @@ const Cart = () => {
           const confirmRemove = window.confirm(
             `Remove "${item.name}" from cart?`
           );
-          return !confirmRemove; // remove if confirmed
+          return !confirmRemove;
         }
         return true;
       });
@@ -29,13 +32,13 @@ const Cart = () => {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  // ✅ Calculate total price
+  // Total Price
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  // ✅ Message for WhatsApp / Instagram
+  // Checkout message
   const message = encodeURIComponent(
     `Hello! I’d like to purchase the following items:\n\n${cart
       .map(
@@ -53,20 +56,17 @@ const Cart = () => {
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
   const instagramLink = `https://www.instagram.com/${instagramUsername}/`;
 
-  return (
+  // ---------- CONTENT UI (same for login/non-login) ----------
+  const content = (
     <div className="bg-white w-full min-h-screen py-12 px-6">
       <h1 className="text-4xl font-bold text-gray-800 text-center mb-10">
         🛒 Your Cart
       </h1>
 
-      {/* ✅ Empty cart message */}
       {cart.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg">
-          Your cart is empty.
-        </p>
+        <p className="text-center text-gray-500 text-lg">Your cart is empty.</p>
       ) : (
         <div className="max-w-4xl mx-auto bg-gray-100 rounded-xl shadow-md p-6">
-          {/* ✅ Cart list */}
           <ul className="divide-y divide-gray-300">
             {cart.map((item) => (
               <li
@@ -85,7 +85,6 @@ const Cart = () => {
                   </div>
                 </div>
 
-                {/* ✅ Quantity controls */}
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => updateQuantity(item.id, -1)}
@@ -111,12 +110,10 @@ const Cart = () => {
             ))}
           </ul>
 
-          {/* ✅ Total */}
           <div className="text-right mt-6 text-lg font-bold text-gray-800">
             Total: ₹{totalPrice}
           </div>
 
-          {/* ✅ Checkout Buttons */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-8">
             <a
               href={whatsappLink}
@@ -140,6 +137,13 @@ const Cart = () => {
       )}
     </div>
   );
+
+  // --------- LOGIN CHECK (same as About.jsx) ----------
+  if (user) {
+    return <UserLayout>{content}</UserLayout>;
+  }
+
+  return content;
 };
 
 export default Cart;
