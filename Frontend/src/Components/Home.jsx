@@ -7,8 +7,8 @@ import mainImage from "../assets/Main_Image.jpg";
 import giftHam from "../assets/giftHam.jpg";
 
 import pendantImg from "../assets/Pendant.jpg";
-import earringImg from "../assets/earring.jpg";
-import braceletImg from "../assets/bracelet.jpg";
+import earringImg from "../assets/Earring.jpg";
+import braceletImg from "../assets/Bracelet.jpg";
 import ringImg from "../assets/ring.jpg";
 
 const Home = () => {
