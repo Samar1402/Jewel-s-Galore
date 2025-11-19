@@ -19,7 +19,7 @@ import giftHam from "../assets/giftHam.jpg";
 
 // --- Bracelet Imports ---
 import celestialTreeImg from "../assets/bracelet/Celestial Tree Bracelet.jpeg" 
-import goldenGripImg from "../assets/bracelet/Golden Grip Bracelet.jpeg";
+import goldenGripImg from "../assets/bracelet/Golden grip Bracelet.jpeg";
 import royalWeaveImg from "../assets/bracelet/Royal Weave Bangle.jpeg"; 
 
 // --- Earring Imports ---
