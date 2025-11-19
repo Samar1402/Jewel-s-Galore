@@ -1,149 +1,147 @@
-import React, { useState, useEffect } from "react";
+import React from "react"; // --- CHANGE: Removed unused useState, useEffect ---
 import UserLayout from "../Layout/UserLayout";
 import { useAuth } from "../Context/AuthContext";
+import { useCart } from "../Components/CartContext"; // --- CHANGE: Import useCart ---
 
 const Cart = () => {
-  const { user } = useAuth(); // check login
-  const [cart, setCart] = useState([]);
+  const { user } = useAuth();
+  
+  // --- CHANGE START: Use context state and functions ---
+  const { cartItems: cart, updateQuantity: contextUpdateQuantity } = useCart();
+  // --- CHANGE END ---
 
-  // Load cart from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("cart");
-    if (saved) setCart(JSON.parse(saved));
-  }, []);
+  // --- CHANGE: Removed local useEffect to load cart from localStorage ---
 
-  // Update quantity
-  const updateQuantity = (id, change) => {
-    const updatedCart = cart
-      .map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + change } : item
-      )
-      .filter((item) => {
-        if (item.quantity <= 0) {
-          const confirmRemove = window.confirm(
-            `Remove "${item.name}" from cart?`
-          );
-          return !confirmRemove;
-        }
-        return true;
-      });
+  // Update quantity (adapted to use context's updateQuantity)
+  const updateQuantity = (id, change) => {
+    // If reducing quantity to 0 or below, prompt user for removal confirmation
+    const currentItem = cart.find(item => item.id === id);
+    if (currentItem && currentItem.quantity + change <= 0) {
+      const confirmRemove = window.confirm(
+        `Remove "${currentItem.name}" from cart?`
+      );
+      if (confirmRemove) {
+        // Use context to remove the item entirely by setting change to negative current quantity
+        contextUpdateQuantity(id, -currentItem.quantity);
+      }
+    } else {
+      contextUpdateQuantity(id, change);
+    }
+    // --- CHANGE: Removed manual localStorage.setItem, context handles it ---
+  };
 
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
+  // Total Price (uses context cart)
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
-  // Total Price
-  const totalPrice = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  // Checkout message (uses context cart)
+  const message = encodeURIComponent(
+    `Hello! I’d like to purchase the following items:\n\n${cart
+      .map(
+        (item) =>
+          `${item.name} - ₹${item.price} x ${item.quantity} = ₹${
+            item.price * item.quantity
+          }`
+      )
+      .join("\n")}\n\nTotal: ₹${totalPrice}\n\nPlease confirm my order.`
+  );
 
-  // Checkout message
-  const message = encodeURIComponent(
-    `Hello! I’d like to purchase the following items:\n\n${cart
-      .map(
-        (item) =>
-          `${item.name} - ₹${item.price} x ${item.quantity} = ₹${
-            item.price * item.quantity
-          }`
-      )
-      .join("\n")}\n\nTotal: ₹${totalPrice}\n\nPlease confirm my order.`
-  );
+  const whatsappNumber = "916200597532";
+  const instagramUsername = "meghas_jewels_galore";
 
-  const whatsappNumber = "916200597532";
-  const instagramUsername = "meghas_jewels_galore";
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
+  const instagramLink = `https://www.instagram.com/${instagramUsername}/`;
 
-  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
-  const instagramLink = `https://www.instagram.com/${instagramUsername}/`;
+  // ---------- CONTENT UI (uses `cart` from context) ----------
+  const content = (
+    <div className="bg-white w-full min-h-screen py-12 px-6">
+      <h1 className="text-4xl font-bold text-gray-800 text-center mb-10">
+        🛒 Your Cart
+      </h1>
 
-  // ---------- CONTENT UI (same for login/non-login) ----------
-  const content = (
-    <div className="bg-white w-full min-h-screen py-12 px-6">
-      <h1 className="text-4xl font-bold text-gray-800 text-center mb-10">
-        🛒 Your Cart
-      </h1>
+      {cart.length === 0 ? (
+        <p className="text-center text-gray-500 text-lg">Your cart is empty.</p>
+      ) : (
+        <div className="max-w-4xl mx-auto bg-gray-100 rounded-xl shadow-md p-6">
+          <ul className="divide-y divide-gray-300">
+            {cart.map((item) => (
+              <li
+                key={item.id}
+                className="flex justify-between items-center py-3"
+              >
+                <div className="flex items-center gap-4">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-16 h-16 rounded object-cover"
+                  />
+                  <div>
+                    <h2 className="font-semibold text-gray-800">{item.name}</h2>
+                    <p className="text-gray-500 text-sm">₹{item.price}</p>
+                  </div>
+                </div>
 
-      {cart.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg">Your cart is empty.</p>
-      ) : (
-        <div className="max-w-4xl mx-auto bg-gray-100 rounded-xl shadow-md p-6">
-          <ul className="divide-y divide-gray-300">
-            {cart.map((item) => (
-              <li
-                key={item.id}
-                className="flex justify-between items-center py-3"
-              >
-                <div className="flex items-center gap-4">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-16 h-16 rounded object-cover"
-                  />
-                  <div>
-                    <h2 className="font-semibold text-gray-800">{item.name}</h2>
-                    <p className="text-gray-500 text-sm">₹{item.price}</p>
-                  </div>
-                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => updateQuantity(item.id, -1)}
+                    className="bg-gray-300 hover:bg-gray-400 px-3 py-1 rounded text-lg font-bold"
+                  >
+                    −
+                  </button>
+                  <span className="text-lg font-semibold text-gray-800">
+                    {item.quantity}
+                  </span>
+                  <button
+                    onClick={() => updateQuantity(item.id, +1)}
+                    className="bg-gray-300 hover:bg-gray-400 px-3 py-1 rounded text-lg font-bold"
+                  >
+                    +
+                  </button>
+                </div>
 
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => updateQuantity(item.id, -1)}
-                    className="bg-gray-300 hover:bg-gray-400 px-3 py-1 rounded text-lg font-bold"
-                  >
-                    −
-                  </button>
-                  <span className="text-lg font-semibold text-gray-800">
-                    {item.quantity}
-                  </span>
-                  <button
-                    onClick={() => updateQuantity(item.id, +1)}
-                    className="bg-gray-300 hover:bg-gray-400 px-3 py-1 rounded text-lg font-bold"
-                  >
-                    +
-                  </button>
-                </div>
+                <p className="font-semibold text-gray-900">
+                  ₹{item.price * item.quantity}
+                </p>
+              </li>
+            ))}
+          </ul>
 
-                <p className="font-semibold text-gray-900">
-                  ₹{item.price * item.quantity}
-                </p>
-              </li>
-            ))}
-          </ul>
+          <div className="text-right mt-6 text-lg font-bold text-gray-800">
+            Total: ₹{totalPrice}
+          </div>
 
-          <div className="text-right mt-6 text-lg font-bold text-gray-800">
-            Total: ₹{totalPrice}
-          </div>
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-8">
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-full shadow-md transition text-center w-full md:w-auto"
+            >
+              💬 Checkout on WhatsApp
+            </a>
 
-          <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-8">
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-full shadow-md transition text-center w-full md:w-auto"
-            >
-              💬 Checkout on WhatsApp
-            </a>
+            <a
+              href={instagramLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-6 py-3 rounded-full shadow-md transition text-center w-full md:w-auto"
+            >
+              📷 Checkout on Instagram
+            </a>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
-            <a
-              href={instagramLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-6 py-3 rounded-full shadow-md transition text-center w-full md:w-auto"
-            >
-              📷 Checkout on Instagram
-            </a>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  // --------- LOGIN CHECK (same as About.jsx) ----------
+  if (user) {
+    return <UserLayout>{content}</UserLayout>;
+  }
 
-  // --------- LOGIN CHECK (same as About.jsx) ----------
-  if (user) {
-    return <UserLayout>{content}</UserLayout>;
-  }
-
-  return content;
+  return content;
 };
 
 export default Cart;
