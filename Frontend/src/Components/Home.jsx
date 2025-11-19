@@ -6,7 +6,7 @@ import UserLayout from "../Layout/UserLayout";
 import mainImage from "../assets/Main_Image.jpg";
 import giftHam from "../assets/giftHam.jpg";
 
-import pendantImg from "../assets/pendant.jpg";
+import pendantImg from "../assets/Pendant.jpg";
 import earringImg from "../assets/earring.jpg";
 import braceletImg from "../assets/bracelet.jpg";
 import ringImg from "../assets/ring.jpg";
