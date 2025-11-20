@@ -54,7 +54,7 @@ const Profile = () => {
   return (
     <UserLayout>
       <div className="flex flex-col items-center justify-center mt-10">
-        <div className="flex flex-col items-center border p-8 rounded shadow w-96">
+        <div className="flex flex-col items-center border p-8 rounded shadow w-102">
           <div className="relative w-48 h-48 mb-6">
             {preview ? (
               <img

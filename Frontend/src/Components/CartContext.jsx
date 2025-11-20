@@ -1,18 +1,43 @@
 import { createContext, useContext, useState, useEffect } from "react";
+// --- CHANGE 1: Import useAuth to access user details ---
+import { useAuth } from "../Context/AuthContext"; 
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(() => {
-    const saved = localStorage.getItem("cartItems");
-    return saved ? JSON.parse(saved) : [];
-  });
+  // --- CHANGE 2: Get the current user from AuthContext ---
+  const { user } = useAuth();
 
+  // --- CHANGE 3: Initialize state as empty (we load data in useEffect now) ---
+  const [cartItems, setCartItems] = useState([]);
+
+  // --- CHANGE 4: Effect to Load Cart OR Clear Cart based on User ---
   useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
+    if (user && user.email) {
+      // If user is logged in, load THEIR specific cart from key "cart_user@email.com"
+      const userCartKey = `cart_${user.email}`;
+      const saved = localStorage.getItem(userCartKey);
+      setCartItems(saved ? JSON.parse(saved) : []);
+    } else {
+      // If user logs out (user is null), CLEAR the cart state immediately
+      setCartItems([]);
+    }
+  }, [user]); // Runs whenever 'user' changes (login/logout)
+
+  // --- CHANGE 5: Effect to Save Cart to the specific user's key ---
+  useEffect(() => {
+    if (user && user.email) {
+      const userCartKey = `cart_${user.email}`;
+      localStorage.setItem(userCartKey, JSON.stringify(cartItems));
+    }
+  }, [cartItems, user]);
+
+  // --- Functions below remain mostly the same, but rely on the state above ---
 
   const addToCart = (item) => {
+    // Optional safety: Don't add if not logged in
+    if (!user) return; 
+
     setCartItems((prev) => {
       const exists = prev.find((p) => p.id === item.id);
       if (exists) {
