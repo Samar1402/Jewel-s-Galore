@@ -37,10 +37,8 @@ const Products = () => {
     
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOrder, setSortOrder] = useState('default'); 
-    // 🔑 CHANGE: Added state for Image Preview Modal
-    const [previewImage, setPreviewImage] = useState(null); // { src: string, name: string }
+    const [previewImage, setPreviewImage] = useState(null); 
 
-    // --- Product Data Consolidated and Categorized (Updated with specific earring names) ---
     const rawProducts = useMemo(() => ([
         // Pendants
         { id: 101, name: "Five-Stone Elegance Chain", price: 349, image: fiveStoneElegance, category: "Pendants" },
@@ -122,18 +120,17 @@ const Products = () => {
         return found ? found.quantity : 0;
     };
 
-    // 🔑 CHANGE: Image Preview Modal Component
     const ImagePreviewModal = () => {
         if (!previewImage) return null;
 
         return (
             <div 
                 className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4"
-                onClick={() => setPreviewImage(null)} // Click outside to close
+                onClick={() => setPreviewImage(null)} 
             >
                 <div 
                     className="bg-white rounded-lg p-6 max-w-lg max-h-full overflow-auto shadow-2xl relative"
-                    onClick={(e) => e.stopPropagation()} // Prevent modal close when clicking inside
+                    onClick={(e) => e.stopPropagation()} 
                 >
                     <button
                         className="absolute top-2 right-2 text-gray-700 text-3xl font-bold hover:text-gray-900"
@@ -155,11 +152,9 @@ const Products = () => {
     };
 
 
-    // --- ProductCard Component (MODIFIED) ---
     const ProductCard = ({ item }) => {
         const quantity = getQuantity(item.id);
         
-        // 🔑 CHANGE: Function to open the modal
         const handleImageClick = () => {
             setPreviewImage({ src: item.image, name: item.name });
         };
@@ -169,7 +164,6 @@ const Products = () => {
                 key={item.id}
                 className="flex items-center bg-white rounded-xl shadow-md p-4 mb-4 hover:shadow-lg transition-shadow duration-200" 
             >
-                {/* 🔑 CHANGE: Removed navigation. Added onClick/onFocus for modal */}
                 <img
                     src={item.image}
                     alt={item.name}
@@ -210,7 +204,6 @@ const Products = () => {
         );
     };
 
-    // --- ProductSection Component (Unchanged) ---
     const ProductSection = ({ title, products }) => (
         <div className="mb-16">
             <h2 className="text-3xl font-semibold text-gray-800 mb-8 border-b-2 border-gray-300 pb-2">
@@ -224,11 +217,9 @@ const Products = () => {
         </div>
     );
 
-    // --- Main Content JSX (ADDED ImagePreviewModal) ---
     const content = (
         <div className="bg-white w-full min-h-screen py-12 px-6 relative">
             
-            {/* 🔑 CHANGE: Added Image Preview Modal component */}
             <ImagePreviewModal />
 
             <h1 className="text-4xl font-extrabold text-[#d4af37] text-center mb-16">

@@ -10,11 +10,14 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
+  // Use environment variable for backend URL
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:8080/auth/login", {
+      const res = await axios.post(`${API_URL}/auth/login`, {
         email,
         password,
       });
@@ -36,7 +39,6 @@ const Login = () => {
       setTimeout(() => {
         navigate("/dashboard");
       }, 800);
-
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");
     }

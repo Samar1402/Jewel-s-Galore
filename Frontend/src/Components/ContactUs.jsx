@@ -102,12 +102,10 @@ const ContactUs = () => {
     </div>
   );
 
-  // If logged in → show with sidebar
   if (user) {
     return <UserLayout>{content}</UserLayout>;
   }
 
-  // If not logged in → show normally
   return content;
 };
 

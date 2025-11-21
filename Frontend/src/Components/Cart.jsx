@@ -1,42 +1,30 @@
-import React from "react"; // --- CHANGE: Removed unused useState, useEffect ---
+import React from "react"; 
 import UserLayout from "../Layout/UserLayout";
 import { useAuth } from "../Context/AuthContext";
-import { useCart } from "../Components/CartContext"; // --- CHANGE: Import useCart ---
-
+import { useCart } from "../Components/CartContext"; 
 const Cart = () => {
   const { user } = useAuth();
   
-  // --- CHANGE START: Use context state and functions ---
   const { cartItems: cart, updateQuantity: contextUpdateQuantity } = useCart();
-  // --- CHANGE END ---
-
-  // --- CHANGE: Removed local useEffect to load cart from localStorage ---
-
-  // Update quantity (adapted to use context's updateQuantity)
   const updateQuantity = (id, change) => {
-    // If reducing quantity to 0 or below, prompt user for removal confirmation
     const currentItem = cart.find(item => item.id === id);
     if (currentItem && currentItem.quantity + change <= 0) {
       const confirmRemove = window.confirm(
         `Remove "${currentItem.name}" from cart?`
       );
       if (confirmRemove) {
-        // Use context to remove the item entirely by setting change to negative current quantity
         contextUpdateQuantity(id, -currentItem.quantity);
       }
     } else {
       contextUpdateQuantity(id, change);
     }
-    // --- CHANGE: Removed manual localStorage.setItem, context handles it ---
   };
 
-  // Total Price (uses context cart)
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  // Checkout message (uses context cart)
   const message = encodeURIComponent(
     `Hello! I’d like to purchase the following items:\n\n${cart
       .map(
@@ -54,7 +42,6 @@ const Cart = () => {
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
   const instagramLink = `https://www.instagram.com/${instagramUsername}/`;
 
-  // ---------- CONTENT UI (uses `cart` from context) ----------
   const content = (
     <div className="bg-white w-full min-h-screen py-12 px-6">
       <h1 className="text-4xl font-bold text-gray-800 text-center mb-10">
@@ -136,7 +123,6 @@ const Cart = () => {
     </div>
   );
 
-  // --------- LOGIN CHECK (same as About.jsx) ----------
   if (user) {
     return <UserLayout>{content}</UserLayout>;
   }

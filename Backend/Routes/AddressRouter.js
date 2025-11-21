@@ -15,7 +15,7 @@ router.get('/:userId', async (req, res) => {
 // Add new address
 router.post('/', async (req, res) => {
   try {
-    const newAddress = new Address(req.body); // expects user_id + address fields
+    const newAddress = new Address(req.body);
     const savedAddress = await newAddress.save();
     res.status(201).json(savedAddress);
   } catch (err) {
