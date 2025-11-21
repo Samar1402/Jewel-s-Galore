@@ -4,8 +4,8 @@ import { FaHome, FaCity, FaMapMarkedAlt, FaGlobe, FaMailBulk } from "react-icons
 import axios from "axios";
 
 const Address = () => {
-  const userId = "12345"; 
-  const API_URL = import.meta.env.VITE_API_URL + "/addresses"; 
+  const userId = "12345"; // Replace dynamically or from AuthContext
+  const API_URL = import.meta.env.VITE_API_URL + "/addresses"; // Use environment variable
 
   const [address, setAddress] = useState(null);
   const [formData, setFormData] = useState({
