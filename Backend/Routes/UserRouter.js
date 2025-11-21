@@ -3,9 +3,7 @@ const router = express.Router();
 const User = require("../Models/user");
 const multer = require("multer"); 
 const path = require("path");
-// --- CHANGE START ---
-const fs = require("fs"); // Import Node's File System module
-// --- CHANGE END ---
+const fs = require("fs"); 
 
 const protect = require("../Middlewares/AuthMiddleware"); 
 
@@ -21,13 +19,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.get("/:userId", async (req, res) => {
-  // ... (existing code for GET route)
 });
 
 router.put("/upload/:userId", protect, upload.single("profileImage"), async (req, res) => {
   try {
-    
-    // Security check:
     if (req.user._id.toString() !== req.params.userId.toString()) {
         return res.status(403).json({ message: "Not authorized to update this profile" });
     }
@@ -36,8 +31,6 @@ router.put("/upload/:userId", protect, upload.single("profileImage"), async (req
         console.error("Multer Error: File was not processed.");
         return res.status(500).json({ message: "Failed to process image file." });
     }
-
-    // --- CHANGE START: Logic to delete the old image file ---
     // 1. Fetch the user object to get the path of the old image
     const userToUpdate = await User.findById(req.params.userId);
 
@@ -53,12 +46,11 @@ router.put("/upload/:userId", protect, upload.single("profileImage"), async (req
             });
         }
     }
-    // --- CHANGE END ---
     
     // Update the user document with the new profileImage path
     const user = await User.findByIdAndUpdate(
       req.params.userId, 
-      { profileImage: `/uploads/${req.file.filename}` }, // Save new relative path to DB
+      { profileImage: `/uploads/${req.file.filename}` }, 
       { new: true, select: '-password' }
     );
 

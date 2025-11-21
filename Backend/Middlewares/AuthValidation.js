@@ -5,18 +5,15 @@ const signupValidation = (req, res, next) => {
     name: Joi.string().min(3).max(100).required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(4).max(100).required(),
-    
-    // --- CHANGE 1: ADD SECURITY KEY VALIDATION ---
     securityKey: Joi.string()
       .length(4)
-      .pattern(/^[0-9]+$/) // Ensures it's exactly 4 digits
+      .pattern(/^[0-9]+$/) 
       .required()
       .messages({
         'string.length': 'Security Pin must be exactly 4 digits.',
         'string.pattern.base': 'Security Pin must contain only numbers.',
         'any.required': 'Security Pin is required.'
       }),
-    // ---------------------------------------------
   });
 
   const { error } = schema.validate(req.body);
