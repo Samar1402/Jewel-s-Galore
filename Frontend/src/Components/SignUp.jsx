@@ -23,6 +23,24 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!name.trim() || !email.trim() || !password.trim() || !securityKey.trim()) {
+      setMessage("Please fill in all fields");
+      return;
+    }
+
+  // Name validation
+    if (name.trim().length < 3) {
+      setMessage("Name must be at least 3 characters long");
+      return;
+    }
+
+  // Security key validation: must be exactly 4 digits, any number
+    if (!/^\d{4}$/.test(securityKey)) {
+      setMessage("Security Pin must be 4 digits (numbers only)");
+      return;
+    }
+
     try {
       const res = await axios.post(`${API_URL}/auth/signup`, {
         name,

@@ -16,6 +16,11 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
+     if (!email.trim() || !password.trim()) {
+    setMessage("Please enter both email and password");
+    return;
+    }
+
     try {
       const res = await axios.post(`${API_URL}/auth/login`, {
         email,
