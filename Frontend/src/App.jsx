@@ -1,5 +1,11 @@
-import { React } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+// src/App.jsx
+import React from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+
+// Context
+import { useAuth } from "./Context/AuthContext.jsx"; 
+
+// Components
 import Home from "./Components/Home";
 import Footer from "./Components/Footer";
 import Header from "./Components/Header";
@@ -12,32 +18,72 @@ import RefundPolicy from "./Components/RefundPolicy";
 import FAQ from "./Components/FAQ";
 import Products from "./Components/Products";
 import Cart from "./Components/Cart";
+
+// User Pages
 import Dashboard from "./pages/Dashboard";
 import OrderHistory from "./pages/OrderHistory";
 import Profile from "./pages/Profile";
 import Address from "./pages/Address";
 
+// Admin Pages
+import AdminDashboard from "./admin/AdminDashboard";
+import AdminProfile from "./admin/AdminProfile";
+
+const AppContent = () => {
+  const { user } = useAuth();
+  const location = useLocation();
+
+  // Check if logged-in user is admin
+  const isAdmin = user?.role === "admin";
+
+  // All admin routes where UI should be isolated
+  const adminPaths = ["/adminDashboard", "/admin/profile"];
+
+  // Check current route
+  const isAdminRoute = adminPaths.includes(location.pathname);
+
+  // Hide header/footer only for admin on admin pages
+  const shouldHideNav = isAdmin && isAdminRoute;
+
+  return (
+    <>
+      {/* Header */}
+      {!shouldHideNav && <Header />}
+
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="about" element={<About />} />
+        <Route path="products" element={<Products />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<SignUp />} />
+        <Route path="forgot" element={<ForgotPassword />} />
+        <Route path="contact" element={<ContactUs />} />
+        <Route path="refund" element={<RefundPolicy />} />
+        <Route path="faq" element={<FAQ />} />
+        <Route path="cart" element={<Cart />} />
+
+        {/* User Routes */}
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="orders" element={<OrderHistory />} />
+        <Route path="address" element={<Address />} />
+
+        {/* Admin Routes */}
+        <Route path="adminDashboard" element={<AdminDashboard />} />
+        <Route path="admin/profile" element={<AdminProfile />} />
+      </Routes>
+
+      {/* Footer */}
+      {!shouldHideNav && <Footer />}
+    </>
+  );
+};
+
 const App = () => {
   return (
     <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="about" element={<About />}></Route>
-        <Route path="products" element={<Products />}></Route>
-        <Route path="login" element={<Login />}></Route>
-        <Route path="signup" element={<SignUp />}></Route>
-        <Route path="forgot" element={<ForgotPassword />}></Route>
-        <Route path="contact" element={<ContactUs />}></Route>
-        <Route path="refund" element={<RefundPolicy />}></Route>
-        <Route path="faq" element={<FAQ />}></Route>
-        <Route path="cart" element={<Cart />}></Route>
-        <Route path="dashboard" element={<Dashboard/>}></Route>
-        <Route path="profile" element={<Profile/>}></Route>
-        <Route path="orders" element={<OrderHistory/>}></Route>
-        <Route path="address" element={<Address/>}></Route>
-      </Routes>
-      <Footer />
+      <AppContent />
     </BrowserRouter>
   );
 };

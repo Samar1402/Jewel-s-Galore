@@ -22,6 +22,13 @@ const UserSchema = new Schema({
     profileImage: {
         type: String,
         default: "", 
+    },
+    // CRITICAL ADDITION: Define the role field
+    role: {
+        type: String,
+        required: true,
+        default: 'user', // Default for public sign-ups
+        enum: ['user', 'admin'] 
     }
 }, { timestamps: true });
 

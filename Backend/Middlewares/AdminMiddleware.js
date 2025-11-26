@@ -5,7 +5,6 @@ module.exports = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    // 🎯 CHANGE: Updated message clarity
     return res.status(401).json({ message: "No authentication token provided or invalid format" });
   }
 
@@ -17,7 +16,7 @@ module.exports = (req, res, next) => {
         return res.status(401).json({ message: "Invalid or expired token" });
     }
     
-    // 🎯 CHANGE: Ensure correct structure of req.user for role check
+    // 🎯 FIX: Ensure role is attached to req.user
     req.user = {
         _id: decoded._id, 
         email: decoded.email,
