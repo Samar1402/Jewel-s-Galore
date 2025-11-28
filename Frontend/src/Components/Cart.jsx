@@ -109,14 +109,7 @@ const Cart = () => {
               💬 Checkout on WhatsApp
             </a>
 
-            <a
-              href={instagramLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-6 py-3 rounded-full shadow-md transition text-center w-full md:w-auto"
-            >
-              📷 Checkout on Instagram
-            </a>
+            
           </div>
         </div>
       )}
