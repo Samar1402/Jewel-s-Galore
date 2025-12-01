@@ -15,10 +15,10 @@ const AuthMiddleware = require("../Middlewares/AuthMiddleware");
 router.post("/", AuthMiddleware, createOrder);
 router.get("/my-orders", AuthMiddleware, getMyOrders);
 
-router.get("/requests", AuthMiddleware, getOrderRequests);             // Status: Pending
-router.get("/processing", AuthMiddleware, getOrderProcessing);         // Status: Confirmed
-router.get("/dispatch", AuthMiddleware, getOrderDispatch);             // Status: Dispatched
-router.get("/delivered", AuthMiddleware, getOrderDelivered);           // Status: Delivered
+router.get("/requests", AuthMiddleware, getOrderRequests);             
+router.get("/processing", AuthMiddleware, getOrderProcessing);         
+router.get("/dispatch", AuthMiddleware, getOrderDispatch);             
+router.get("/delivered", AuthMiddleware, getOrderDelivered);           
 
 
 router.put("/update-status/:id", AuthMiddleware, updateOrderStatus);
