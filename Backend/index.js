@@ -4,28 +4,20 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const path = require('path'); 
 
-// 1. Configuration/Environment Setup
 require('dotenv').config();
-require('./Models/db'); // Database connection logic
+require('./Models/db'); 
 
 const PORT = process.env.PORT || 8080
 
-// 2. Core Middleware Setup (MUST come before any app.use('/route', ...))
-// Handles cross-origin requests
 app.use(cors());
 
-// Handles JSON bodies 
 app.use(bodyParser.json()); 
 
-// Handles static files like profile images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// 3. Import Route Definitions
 const adminRoutes = require('./Routes/adminRoutes'); 
 const hashRouter = require('./Routes/tempHash'); 
 
-
-// 4. Application Routes
 app.use('/admin', adminRoutes); 
 app.use('/api/utils', hashRouter); 
 app.use('/auth', require('./Routes/AuthRouter'));
