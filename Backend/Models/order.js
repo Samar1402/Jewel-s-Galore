@@ -25,7 +25,6 @@ const orderSchema = new mongoose.Schema(
       },
     ],
     
-    // The definition that makes the field REQUIRED
     deliveryAddress: {
         type: deliveryAddressSchema,
         required: true,
@@ -35,6 +34,17 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+
+    // NEW FIELDS ADDED HERE
+    deliveryBoyName: {
+        type: String,
+        required: false, 
+    },
+    deliveryBoyContact: {
+        type: String,
+        required: false,
+    },
+    // END NEW FIELDS
 
     status: {
       type: String,

@@ -27,10 +27,14 @@ import Address from "./pages/Address";
 // Admin Pages
 import AdminDashboard from "./admin/AdminDashboard";
 import AdminProfile from "./admin/AdminProfile";
+import AdminReports from "./admin/AdminReport.jsx";
 
 // Admin Order Workflow Views
 import OrderRequests from "./admin/Orders/OrderRequests";         
 import OrderProcessing from "./admin/Orders/OrderProcessing";     
+import OrderDispatch from "./admin/Orders/OrderDispatch.jsx";
+import OrderDelivered from "./admin/Orders/OrderDelivered.jsx";
+import AnalyticsPage from "./admin/AnalyticsPage.jsx";
 
 
 const AppContent = () => {
@@ -42,10 +46,13 @@ const AppContent = () => {
   const adminPaths = [
     "/adminDashboard", 
     "/admin/profile",
-    "/admin/orders/processing" 
+    "/admin/orders/processing", 
+    "/admin/orders/dispatch",
+    "/admin/orders/delivered",
+    "/admin/reports",
+    "/admin/analytics"
 ];
 
-  // Check current route 
   const isAdminRoute = adminPaths.some(path => location.pathname.startsWith(path)) || 
                        (isAdmin && location.pathname === '/orders'); 
 
@@ -73,7 +80,6 @@ const AppContent = () => {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
         
-        {/* Role-Based Order Routing for /orders */}
         <Route 
             path="orders" 
             element={isAdmin ? <OrderRequests /> : <OrderHistory />} 
@@ -89,9 +95,12 @@ const AppContent = () => {
         {isAdmin && (
             <>
                 <Route path="admin/orders/processing" element={<OrderProcessing />} />
-                {/* Add paths for dispatch and delivered views here */}
+                <Route path="admin/orders/dispatch" element={<OrderDispatch/>}/>
+                <Route path="admin/orders/delivered" element={<OrderDelivered/>}/>
             </>
         )}
+        <Route path="admin/reports" element={<AdminReports />} />
+        <Route path="admin/analytics" element={<AnalyticsPage />} />
       </Routes>
 
       {/* Footer */}
