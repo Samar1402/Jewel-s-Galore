@@ -1,4 +1,4 @@
-import React from 'react'; // <-- Ensure React is imported if you use JSX
+import React from 'react'; 
 import OrderViewTemplate from './OrderViewTemplate';
 
 const OrderProcessing = () => (
@@ -8,4 +8,4 @@ const OrderProcessing = () => (
     />
 );
 
-export default OrderProcessing; // <-- This is the crucial line that was missing or incorrect
+export default OrderProcessing; 

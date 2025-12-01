@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import UserLayout from "../Layout/UserLayout";
 import { useAuth } from "../Context/AuthContext";
 import { authFetch } from "../utils/api";
-
+import { FaMapMarkerAlt, FaHome } from 'react-icons/fa'; 
 
 const getStatusColor = (status) => {
     switch (status) {
@@ -51,32 +51,52 @@ const OrderHistory = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {orders.map(order => (
-                            <div key={order._id} className="bg-white p-4 shadow rounded-lg">
-                                <div className="flex justify-between">
-                                    <h3 className="font-semibold">Order #{order._id.slice(-6).toUpperCase()}</h3>
-                                    <span className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleString()}</span>
+                            <div key={order._id} className="bg-white p-4 shadow-lg rounded-xl border border-gray-100">
+                                <div className="flex justify-between items-center border-b pb-2 mb-3">
+                                    <h3 className="font-bold text-lg text-gray-800">Order #{order._id.slice(-6).toUpperCase()}</h3>
+                                    <span className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</span>
                                 </div>
 
                                 
-                                <p className="mt-2">
+                                <p className="mb-3 text-sm">
                                     Status: 
                                     <strong 
-                                        className={getStatusColor(order.status)}
+                                        className={`font-semibold ${getStatusColor(order.status)}`}
                                     >
                                         {order.status}
                                     </strong>
                                 </p>
+                                <div className="border p-2 rounded-lg bg-gray-50 text-xs text-gray-700 space-y-1 mb-3">
+                                    <h4 className="font-semibold flex items-center gap-1 text-[#b8860b]">
+                                        <FaMapMarkerAlt /> Shipping To
+                                    </h4>
+                                    {order.deliveryAddress ? (
+                                        <>
+                                            <p className="pl-5 flex items-start">
+                                                <FaHome className="text-[#b8860b] mr-2 mt-0.5" /> 
+                                                <span className="leading-tight">
+                                                    {order.deliveryAddress.street}, {order.deliveryAddress.city}, {order.deliveryAddress.state} - {order.deliveryAddress.pincode}, {order.deliveryAddress.country}
+                                                </span>
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <p className="pl-5 text-red-500">Address not recorded.</p>
+                                    )}
+                                </div>
 
-                                <div className="mt-3">
+
+                                {/* Order Items List */}
+                                <div className="mt-3 border-t pt-3">
+                                    <h4 className="font-semibold text-sm mb-1">Items:</h4>
                                     {order.items.map((it, i) => (
-                                        <div key={i} className="flex justify-between border-b py-1">
+                                        <div key={i} className="flex justify-between py-0.5 text-sm">
                                             <span>{it.name}</span>
-                                            <span>{it.qty} × ₹{it.price}</span>
+                                            <span className="font-medium text-gray-600">{it.qty} × ₹{it.price}</span>
                                         </div>
                                     ))}
                                 </div> 
 
-                                <div className="mt-3 font-bold text-[#b8860b]">Total: ₹{order.totalAmount}</div>
+                                <div className="mt-3 pt-3 border-t font-bold text-lg text-[#b8860b]">Total: ₹{order.totalAmount}</div>
                             </div>
                         ))}
                     </div>

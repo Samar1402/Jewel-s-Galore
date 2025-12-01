@@ -1,38 +1,47 @@
 const Order = require("../Models/order");
 
+exports.createOrder = async (req, res) => {
+    try {
+        // 🛑 CRITICAL FIX: Extract 'deliveryAddress' along with other fields
+        const { items, totalAmount, deliveryAddress } = req.body;
+        
+        if (!items || items.length === 0 || !totalAmount) {
+            return res.status(400).json({ success: false, message: "Missing order details" });
+        }
 
-exports.createOrder = async (req, res) => { /* ... (existing logic) ... */ 
-    try {
-        const { items, totalAmount } = req.body;
-        
-        if (!items || items.length === 0 || !totalAmount) {
-            return res.status(400).json({ success: false, message: "Missing order details" });
+        // Mongoose will perform this check, but this explicit check helps catch client-side errors early.
+        if (!deliveryAddress || !deliveryAddress.street) {
+             return res.status(400).json({ success: false, message: "Delivery address is missing or incomplete." });
         }
 
-        const order = new Order({
-            user: req.user.id, 
-            items,
-            totalAmount,
-            status: 'Pending', 
-        });
 
-        await order.save();
-        res.status(201).json({ success: true, message: "Order created successfully", order });
+        const order = new Order({
+            user: req.user.id, 
+            items,
+            totalAmount,
+            // ✅ PASS THE ADDRESS OBJECT TO THE SCHEMA
+            deliveryAddress, 
+            status: 'Pending', 
+        });
 
-    } catch (err) {
-        console.error("createOrder:", err);
-        res.status(500).json({ success: false, message: err.message });
-    }
+        await order.save();
+        res.status(201).json({ success: true, message: "Order created successfully", order });
+
+    } catch (err) {
+        console.error("createOrder Error:", err);
+        // Return the error message to help debug any new validation failures
+        res.status(500).json({ success: false, message: "Failed to create order: " + err.message });
+    }
 };
 
 exports.getMyOrders = async (req, res) => { 
-    try {
-        const orders = await Order.find({ user: req.user.id }).sort({ createdAt: -1 });
-        res.json({ success: true, orders });
-    } catch (err) {
-        console.error("getMyOrders:", err);
-        res.status(500).json({ success: false, message: err.message });
-    }
+    try {
+        const orders = await Order.find({ user: req.user.id }).sort({ createdAt: -1 });
+        res.json({ success: true, orders });
+    } catch (err) {
+        console.error("getMyOrders:", err);
+        res.status(500).json({ success: false, message: err.message });
+    }
 };
 
 
