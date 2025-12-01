@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
@@ -21,7 +20,7 @@ import Cart from "./Components/Cart";
 
 // User Pages
 import Dashboard from "./pages/Dashboard";
-import OrderHistory from "./pages/OrderHistory";
+import OrderHistory from "./pages/OrderHistory"; 
 import Profile from "./pages/Profile";
 import Address from "./pages/Address";
 
@@ -29,63 +28,84 @@ import Address from "./pages/Address";
 import AdminDashboard from "./admin/AdminDashboard";
 import AdminProfile from "./admin/AdminProfile";
 
+// Admin Order Workflow Views
+import OrderRequests from "./admin/Orders/OrderRequests";         
+import OrderProcessing from "./admin/Orders/OrderProcessing";     
+
+
 const AppContent = () => {
-  const { user } = useAuth();
-  const location = useLocation();
+  const { user } = useAuth();
+  const location = useLocation();
 
-  // Check if logged-in user is admin
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "admin";
 
-  // All admin routes where UI should be isolated
-  const adminPaths = ["/adminDashboard", "/admin/profile"];
+  const adminPaths = [
+    "/adminDashboard", 
+    "/admin/profile",
+    "/admin/orders/processing" 
+];
 
-  // Check current route
-  const isAdminRoute = adminPaths.includes(location.pathname);
+  // Check current route 
+  const isAdminRoute = adminPaths.some(path => location.pathname.startsWith(path)) || 
+                       (isAdmin && location.pathname === '/orders'); 
 
-  // Hide header/footer only for admin on admin pages
-  const shouldHideNav = isAdmin && isAdminRoute;
+  const shouldHideNav = isAdmin && isAdminRoute;
 
-  return (
-    <>
-      {/* Header */}
-      {!shouldHideNav && <Header />}
+  return (
+    <>
+      {/* Header */}
+      {!shouldHideNav && <Header />}
 
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="about" element={<About />} />
-        <Route path="products" element={<Products />} />
-        <Route path="login" element={<Login />} />
-        <Route path="signup" element={<SignUp />} />
-        <Route path="forgot" element={<ForgotPassword />} />
-        <Route path="contact" element={<ContactUs />} />
-        <Route path="refund" element={<RefundPolicy />} />
-        <Route path="faq" element={<FAQ />} />
-        <Route path="cart" element={<Cart />} />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="about" element={<About />} />
+        <Route path="products" element={<Products />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<SignUp />} />
+        <Route path="forgot" element={<ForgotPassword />} />
+        <Route path="contact" element={<ContactUs />} />
+        <Route path="refund" element={<RefundPolicy />} />
+        <Route path="faq" element={<FAQ />} />
+        <Route path="cart" element={<Cart />} />
 
-        {/* User Routes */}
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="orders" element={<OrderHistory />} />
-        <Route path="address" element={<Address />} />
+        {/* User Routes */}
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="profile" element={<Profile />} />
+        
+        {/* Role-Based Order Routing for /orders */}
+        <Route 
+            path="orders" 
+            element={isAdmin ? <OrderRequests /> : <OrderHistory />} 
+        />
+        
+        <Route path="address" element={<Address />} />
 
-        {/* Admin Routes */}
-        <Route path="adminDashboard" element={<AdminDashboard />} />
-        <Route path="admin/profile" element={<AdminProfile />} />
-      </Routes>
+        {/* Admin Routes */}
+        <Route path="adminDashboard" element={<AdminDashboard />} />
+        <Route path="admin/profile" element={<AdminProfile />} />
 
-      {/* Footer */}
-      {!shouldHideNav && <Footer />}
-    </>
-  );
+        {/* Nested Admin Order Route */}
+        {isAdmin && (
+            <>
+                <Route path="admin/orders/processing" element={<OrderProcessing />} />
+                {/* Add paths for dispatch and delivered views here */}
+            </>
+        )}
+      </Routes>
+
+      {/* Footer */}
+      {!shouldHideNav && <Footer />}
+    </>
+  );
 };
 
 const App = () => {
-  return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
-  );
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
 };
 
 export default App;

@@ -4,36 +4,38 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const path = require('path'); 
 
+// 1. Configuration/Environment Setup
 require('dotenv').config();
-require('./Models/db');
-
-// 👇 1. IMPORT ADMIN ROUTES
-const adminRoutes = require('./Routes/adminRoutes'); // Assuming you named your file adminRoutes.js
-
-// 👇 2. IMPORT THE TEMPORARY HASH ROUTER
-const hashRouter = require('./Routes/tempHash'); 
+require('./Models/db'); // Database connection logic
 
 const PORT = process.env.PORT || 8080
 
-// --- Middleware Setup ---
-app.use(bodyParser.json()); 
-app.use(cors())
+// 2. Core Middleware Setup (MUST come before any app.use('/route', ...))
+// Handles cross-origin requests
+app.use(cors());
 
-// Serve static image files from the 'uploads' directory
+// Handles JSON bodies 
+app.use(bodyParser.json()); 
+
+// Handles static files like profile images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// --- Route Registrations ---
+// 3. Import Route Definitions
+const adminRoutes = require('./Routes/adminRoutes'); 
+const hashRouter = require('./Routes/tempHash'); 
 
-// 🎯 CHANGE: MOUNT THE ADMIN ROUTER (Resolves the 404 Error)
+
+// 4. Application Routes
 app.use('/admin', adminRoutes); 
-
-// Standard Routes
 app.use('/api/utils', hashRouter); 
 app.use('/auth', require('./Routes/AuthRouter'));
 app.use('/addresses', require('./Routes/AddressRouter'));
 app.use('/users', require('./Routes/UserRouter'));
 
+app.use("/api/orders", require(path.join(__dirname, 'Routes', 'orderRoutes')));
+
 app.get('/', (req, res) => res.send("Server is running"));
+
 
 app.listen(PORT, ()=>{
     console.log(`Server is running on ${PORT}`)
