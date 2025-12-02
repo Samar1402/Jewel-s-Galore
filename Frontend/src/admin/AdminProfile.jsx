@@ -1,31 +1,37 @@
 import React, { useState, useEffect, useRef } from "react";
 import AdminLayout from "./AdminLayout"; 
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // 🎯 FIX: Import useNavigate
+import { useNavigate } from "react-router-dom"; 
 
 const AdminProfile = () => {
-  const [admin, setAdmin] = useState(null);
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState("");
-  const fileInputRef = useRef(null);
-  
-  // 🎯 FIX: Initialize useNavigate
-  const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
   const token = localStorage.getItem("token");
   const adminId = localStorage.getItem("adminId");
 
+  const PLACEHOLDER_URL = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='gray'><path d='M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z' /></svg>";
+
+  const getFullImageUrl = (path) => {
+    if (!path) return PLACEHOLDER_URL;
+    if (path && path.startsWith('/uploads')) {
+        return `${API_URL}${path}`;
+    }
+    return path; 
+  };
+  
+  const [admin, setAdmin] = useState(null);
+  const [image, setImage] = useState(null); 
+  const [preview, setPreview] = useState(PLACEHOLDER_URL); 
+  const fileInputRef = useRef(null);
+  
   useEffect(() => {
-    // 🔑 FIX: Enforce login if adminId or token is missing
     if (adminId && token) {
       fetchAdmin();
     } else {
         console.error("Authentication data missing. Redirecting to login.");
-        // 🎯 FIX: Redirect the user if not authorized
-        navigate('/login'); 
+        navigate('/login'); 
     }
-    // Add navigate to dependency array
   }, [adminId, token, navigate]); 
 
   const fetchAdmin = async () => {
@@ -35,37 +41,29 @@ const AdminProfile = () => {
       });
       
       setAdmin(res.data);
-      
-      // Use a placeholder image if profileImage is null
-      const profileImagePath = res.data.profileImage 
-        ? `${API_URL}${res.data.profileImage}` 
-        // 🎯 OPTION: Use a local path (or better placeholder) to fix NET::ERR_NAME_NOT_RESOLVED
-        : 'https://via.placeholder.com/160/0D47A1/FFFFFF?text=ADMIN';
-        
-      setPreview(profileImagePath);
+      setPreview(getFullImageUrl(res.data.profileImage));
 
     } catch (err) {
       console.error("Error fetching admin profile:", err.response ? err.response.data : err.message);
-      
-      // 🎯 FIX: Handle 401 (Unauthorized) or 403 (Forbidden) response from the backend
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-          console.error("Token invalid or role unauthorized. Redirecting.");
-          // Clear storage on failure
-          localStorage.removeItem('token');
-          localStorage.removeItem('adminId');
-          navigate('/login');
-      }
+      
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('adminId');
+          navigate('/login');
+      }
     }
   };
 
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
-    setImage(file);
-    setPreview(URL.createObjectURL(file));
+    if (file) {
+        setImage(file);
+        setPreview(URL.createObjectURL(file)); 
+    }
   };
 
   const handleImageUpload = async () => {
-    if (!image) return alert("Select an image");
+    if (!image) return alert("Please select an image to upload.");
 
     const formData = new FormData();
     formData.append("profileImage", image);
@@ -78,40 +76,55 @@ const AdminProfile = () => {
         },
       });
 
-      alert("Profile image updated");
-      fetchAdmin();
+      alert("Profile image updated successfully.");
+      fetchAdmin(); 
+      
+      setImage(null); 
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; 
+      }
+
     } catch (error) {
-      console.error(error);
+      console.error("Image upload failed:", error);
+      alert("Image upload failed. Please check the console for errors.");
     }
   };
+    
+  const handleImageRemove = async () => {
+    if (!admin.profileImage) {
+        return alert("There is no image to remove.");
+    }
 
-  const handleSave = async () => {
-    try {
-      await axios.put(
-        `${API_URL}/admin/${adminId}`,
-        { name: admin.name, email: admin.email },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    if (!window.confirm("Are you sure you want to remove the current profile image?")) {
+        return;
+    }
 
-      alert("Details updated");
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    try {
+        await axios.delete(`${API_URL}/admin/remove-image/${adminId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        alert("Profile image removed successfully.");
+        fetchAdmin(); 
+
+    } catch (error) {
+        console.error("Image removal failed:", error);
+        alert("Image removal failed. Please check the console for errors.");
+    }
+  };
+
 
   if (!admin) return <AdminLayout><p>Loading...</p></AdminLayout>;
 
   return (
     <AdminLayout>
-      <div className="max-w-lg mx-auto bg-white shadow p-6 rounded-xl">
-        <h2 className="text-2xl font-bold mb-4">Admin Profile</h2>
-
-        {/* Image Section */}
+      <div className="max-w-lg mx-auto bg-white shadow p-6 rounded-xl mt-6">
         <div className="flex flex-col items-center mb-6">
           <img
             src={preview}
             className="w-40 h-40 rounded-full object-cover border mb-4"
-            alt="Admin"
+            alt="Admin Profile"
+            onError={(e) => { e.target.onerror = null; e.target.src=PLACEHOLDER_URL }}
           />
 
           <input
@@ -122,45 +135,42 @@ const AdminProfile = () => {
             onChange={handleImageSelect}
           />
 
-          <button
-            className="bg-yellow-600 text-white px-4 py-2 rounded mb-2"
-            onClick={() => fileInputRef.current.click()}
-          >
-            Change Image
-          </button>
-
-          {image && (
-            <button
-              className="bg-green-700 text-white px-4 py-2 rounded"
-              onClick={handleImageUpload}
-            >
-              Upload Image
-            </button>
-          )}
+          <div className="flex space-x-2">
+            <button
+              className="bg-yellow-600 text-white px-4 py-2 rounded mb-2 hover:bg-yellow-700 transition"
+              onClick={() => fileInputRef.current.click()}
+            >
+              Change Image
+            </button>
+              
+            {image ? (
+                <button
+                  className="bg-green-700 text-white px-4 py-2 rounded mb-2 hover:bg-green-800 transition"
+                  onClick={handleImageUpload}
+                >
+                  Upload Image
+                </button>
+            ) : (
+                admin.profileImage && (
+                    <button
+                        className="bg-red-600 text-white px-4 py-2 rounded mb-2 hover:bg-red-700 transition"
+                        onClick={handleImageRemove}
+                    >
+                        Remove Image
+                    </button>
+                )
+            )}
+          </div>
         </div>
 
-        {/* Name */}
-        <label className="font-semibold">Name</label>
-        <input
-          className="w-full p-2 border rounded mb-4"
-          value={admin.name || ''}
-          onChange={(e) => setAdmin({ ...admin, name: e.target.value })}
-        />
-
-        {/* Email */}
-        <label className="font-semibold">Email</label>
-        <input
-          className="w-full p-2 border rounded mb-4"
-          value={admin.email || ''}
-          onChange={(e) => setAdmin({ ...admin, email: e.target.value })}
-        />
-
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded w-full"
-          onClick={handleSave}
-        >
-          Save Changes
-        </button>
+        <label className="font-semibold block mb-1">Name</label>
+        <p className="w-full p-3 bg-gray-100 border border-gray-300 rounded mb-4 text-gray-800 font-medium">
+          {admin.name || 'N/A'}
+        </p>
+        <label className="font-semibold block mb-1">Email</label>
+        <p className="w-full p-3 bg-gray-100 border border-gray-300 rounded mb-6 text-gray-800 font-medium">
+          {admin.email || 'N/A'}
+        </p>
       </div>
     </AdminLayout>
   );
