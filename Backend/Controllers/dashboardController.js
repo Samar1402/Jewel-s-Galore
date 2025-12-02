@@ -1,17 +1,23 @@
 const Order = require('../Models/order'); 
 
-
 const getDashboardStats = async (req, res) => {
     try {
         const pipeline = [
             { 
                 $addFields: { 
-                    totalAmountNumeric: { $toDouble: "$totalAmount" } 
+                    statusUpper: { $toUpper: "$status" },
+                    totalAmountNumeric: { 
+                        $ifNull: [
+                            { $toDecimal: "$totalAmount" }, 
+                            0
+                        ]
+                    }
                 } 
             },
+            
             {
                 $group: {
-                    _id: "$status",
+                    _id: "$statusUpper",
                     count: { $sum: 1 },
                     revenue: { $sum: "$totalAmountNumeric" } 
                 }
@@ -20,26 +26,27 @@ const getDashboardStats = async (req, res) => {
             {
                 $group: {
                     _id: null,
-                    totalOrders: { $sum: "$count" },
+                    totalOrdersAll: { $sum: "$count" }, 
                     overallRevenue: { $sum: "$revenue" },
-                    confirmed: { $sum: { $cond: [ { $eq: ["$_id", "Confirmed"] }, "$count", 0 ] } },
-                    dispatched: { $sum: { $cond: [ { $eq: ["$_id", "Dispatched"] }, "$count", 0 ] } },
-                    delivered: { $sum: { $cond: [ { $eq: ["$_id", "Delivered"] }, "$count", 0 ] } },
-                    deliveredRevenue: { $sum: { $cond: [ { $eq: ["$_id", "Delivered"] }, "$revenue", 0 ] } },
-                    processingRevenue: { $sum: { $cond: [ { $in: ["$_id", ["Confirmed", "Processing"]] }, "$revenue", 0 ] } },
+                    pending: { $sum: { $cond: [ { $eq: ["$_id", "PENDING"] }, "$count", 0 ] } },
+                    confirmed: { $sum: { $cond: [ { $eq: ["$_id", "CONFIRMED"] }, "$count", 0 ] } },
+                    dispatched: { $sum: { $cond: [ { $eq: ["$_id", "DISPATCHED"] }, "$count", 0 ] } },
+                    delivered: { $sum: { $cond: [ { $eq: ["$_id", "DELIVERED"] }, "$count", 0 ] } },
+                    deliveredRevenue: { $sum: { $cond: [ { $eq: ["$_id", "DELIVERED"] }, "$revenue", 0 ] } },
+                    processingRevenue: { $sum: { $cond: [ { $eq: ["$_id", "CONFIRMED"] }, "$revenue", 0 ] } },
                 }
             },
 
             { 
                 $project: { 
-                    _id: 0, 
-                    totalOrders: 1, 
+                    _id: 0,
+                    totalOrders: "$pending", 
                     confirmed: 1, 
                     dispatched: 1, 
                     delivered: 1, 
-                    overallRevenue: 1, 
-                    deliveredRevenue: 1, 
-                    processingRevenue: 1 
+                    overallRevenue: { $toDouble: "$overallRevenue" }, 
+                    deliveredRevenue: { $toDouble: "$deliveredRevenue" }, 
+                    processingRevenue: { $toDouble: "$processingRevenue" } 
                 } 
             }
         ];
@@ -49,10 +56,8 @@ const getDashboardStats = async (req, res) => {
         if (stats.length > 0) {
             return res.json({ ok: true, data: stats[0] });
         } else {
-            return res.json({ 
-                ok: true, 
-                data: { totalOrders: 0, confirmed: 0, dispatched: 0, delivered: 0, overallRevenue: 0, deliveredRevenue: 0, processingRevenue: 0 } 
-            });
+            const zeroStats = { totalOrders: 0, confirmed: 0, dispatched: 0, delivered: 0, overallRevenue: 0, deliveredRevenue: 0, processingRevenue: 0 };
+            return res.json({ ok: true, data: zeroStats });
         }
     } catch (error) {
         console.error("Error in getDashboardStats:", error);

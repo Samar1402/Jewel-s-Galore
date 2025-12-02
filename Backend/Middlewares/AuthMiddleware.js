@@ -18,7 +18,6 @@ module.exports = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
         req.user = {
             id: decoded.id || decoded._id,
             email: decoded.email,
@@ -27,7 +26,7 @@ module.exports = (req, res, next) => {
 
         next();
     } catch (err) {
-        console.error(`❌ JWT Verification Failed for token starting with ${token.substring(0, 5)}...:`, err.message);
+        console.error(`❌ JWT Verification Failed:`, err.message);
         return res.status(401).json({ success: false, message: "Invalid or expired token" });
     }
 };
