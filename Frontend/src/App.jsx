@@ -25,16 +25,16 @@ import Profile from "./pages/Profile";
 import Address from "./pages/Address";
 
 // Admin Pages
-import AdminDashboard from "./admin/AdminDashboard";
-import AdminProfile from "./admin/AdminProfile";
-import AdminReports from "./admin/AdminReport.jsx";
+import AdminDashboard from "./admin/Layout/AdminDashboard";
+import AdminProfile from "./admin/Layout/AdminProfile";
+import AdminReports from "./admin/Layout/AdminReport.jsx";
 
 // Admin Order Workflow Views
 import OrderRequests from "./admin/Orders/OrderRequests";         
 import OrderProcessing from "./admin/Orders/OrderProcessing";     
 import OrderDispatch from "./admin/Orders/OrderDispatch.jsx";
 import OrderDelivered from "./admin/Orders/OrderDelivered.jsx";
-import AnalyticsPage from "./admin/AnalyticsPage.jsx";
+import AnalyticsPage from "./admin/Layout/AnalyticsPage.jsx";
 
 
 const AppContent = () => {
@@ -46,6 +46,7 @@ const AppContent = () => {
   const adminPaths = [
     "/adminDashboard", 
     "/admin/profile",
+    "/admin/orders",
     "/admin/orders/processing", 
     "/admin/orders/dispatch",
     "/admin/orders/delivered",
@@ -91,7 +92,6 @@ const AppContent = () => {
         <Route path="adminDashboard" element={<AdminDashboard />} />
         <Route path="admin/profile" element={<AdminProfile />} />
 
-        {/* Nested Admin Order Route */}
         {isAdmin && (
             <>
                 <Route path="admin/orders/processing" element={<OrderProcessing />} />

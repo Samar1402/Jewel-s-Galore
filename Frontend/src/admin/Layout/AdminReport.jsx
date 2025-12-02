@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "./AdminLayout";
-import { authFetch } from "../utils/api";
+import { authFetch } from "../../utils/api";
 import { FaDownload, FaFilePdf, FaFileCsv, FaSearch } from "react-icons/fa";
 
 const AdminReports = () => {
@@ -62,8 +62,6 @@ const AdminReports = () => {
       <div className="w-full">
 
         <h1 className="text-3xl font-bold mb-6">📄 Reports</h1>
-
-        {/* Filters */}
         <div className="bg-white p-4 rounded-xl shadow mb-6">
           <h2 className="text-xl font-semibold mb-3">Filter Reports</h2>
           
@@ -121,8 +119,6 @@ const AdminReports = () => {
 
           </div>
         </div>
-
-        {/* Export Buttons */}
         <div className="flex gap-4 mb-6 flex-wrap">
           <button
             onClick={exportCSV}
@@ -138,8 +134,6 @@ const AdminReports = () => {
             <FaFilePdf /> Export PDF
           </button>
         </div>
-
-        {/* Reports Table */}
         <div className="bg-white p-4 rounded-xl shadow overflow-x-auto">
           <table className="min-w-full border">
             <thead>

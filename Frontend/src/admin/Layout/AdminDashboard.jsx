@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "./AdminLayout";
-import { useAuth } from "../Context/AuthContext"; 
-import { authFetch } from "../utils/api"; 
+import { useAuth } from "../../Context/AuthContext"; 
+import { authFetch } from "../../utils/api"; 
 import { Link } from 'react-router-dom'; 
 
 import { 

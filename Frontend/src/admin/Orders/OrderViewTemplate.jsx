@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import AdminLayout from '../../admin/AdminLayout.jsx';
+import AdminLayout from '../Layout/AdminLayout.jsx';
 import { authFetch } from '../../utils/api';
 import { useAuth } from '../../Context/AuthContext';
 import { FaMapMarkerAlt, FaBoxOpen, FaUserCheck, FaPhoneVolume, FaCalendarAlt, FaCheckCircle } from 'react-icons/fa'; 

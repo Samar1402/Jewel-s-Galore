@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import AdminSidebar from "./AdminSidebar";
 
 const AdminLayout = ({ children }) => {
@@ -9,8 +9,6 @@ const AdminLayout = ({ children }) => {
 
   return (
     <div className={`flex min-h-screen bg-gray-100 overflow-hidden`}>
-
-      {/* ---- SIDEBAR ---- */}
       <aside
         className={`
           fixed inset-y-0 left-0 w-64 bg-gray-800 text-white z-50
@@ -32,7 +30,6 @@ const AdminLayout = ({ children }) => {
         </div>
       </aside>
 
-      {/* ---- OVERLAY (mobile) ---- */}
       {open && (
         <div
           onClick={() => setOpen(false)}
@@ -40,7 +37,6 @@ const AdminLayout = ({ children }) => {
         ></div>
       )}
 
-      {/* ---- MAIN PAGE CONTENT ---- */}
       <div
         className={`
           flex-1 flex flex-col min-h-screen 
@@ -49,7 +45,6 @@ const AdminLayout = ({ children }) => {
           ${open ? "max-w-screen overflow-hidden" : "overflow-x-hidden"}
         `}
       >
-        {/* Header */}
         <header className="bg-white shadow p-4 flex items-center justify-between sticky top-0 z-20">
           <button className="lg:hidden" onClick={() => setOpen(true)}>
             <FaBars size={22} />
@@ -58,7 +53,6 @@ const AdminLayout = ({ children }) => {
           <span className="font-medium">{user?.name || "Admin"}</span>
         </header>
 
-        {/* Page Content */}
         <main className="flex-1 p-4 overflow-y-auto overflow-x-hidden">
           {children}
         </main>
