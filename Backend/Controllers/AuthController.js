@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const UserModel = require("../Models/user");
 const bcrypt = require('bcrypt');
 
-// ---------------------- LOGIN ----------------------
 const login = async(req,res)=>{
     try{
         const { email, password } = req.body;
@@ -19,7 +18,7 @@ const login = async(req,res)=>{
             { 
                 email: user.email, 
                 _id: user._id,
-                role: user.role // 🔑 CHANGE: ADD ROLE TO JWT PAYLOAD
+                role: user.role 
             },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
@@ -32,14 +31,13 @@ const login = async(req,res)=>{
             name: user.name,
             _id: user._id,
             profileImage: user.profileImage,
-            role: user.role // 🔑 CHANGE: ADD ROLE TO RESPONSE BODY
+            role: user.role 
         })
     }catch(err){
         res.status(500).json({message: "Internal Server Error", sucess: false})
     }
 }
 
-// ---------------------- SIGNUP ----------------------
 const signup = async (req, res) => {
   try {
     const { name, email, password, securityKey } = req.body;
@@ -54,7 +52,7 @@ const signup = async (req, res) => {
         email, 
         password: hashedPassword, 
         securityKey,
-        role: 'user' // 🔑 CHANGE: SET DEFAULT ROLE
+        role: 'user' 
     });
     
     await newUser.save();
@@ -69,7 +67,7 @@ const signup = async (req, res) => {
       name: newUser.name, 
       email: newUser.email,
       profileImage: newUser.profileImage,
-      role: 'user' // 🔑 CHANGE: ADD ROLE TO RESPONSE BODY
+      role: 'user' 
     });
   } catch (err) {
     console.error(err);
@@ -77,7 +75,6 @@ const signup = async (req, res) => {
   }
 };
 
-// ---------------------- GET USER ----------------------
 const getUser = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -89,7 +86,6 @@ const getUser = async (req, res) => {
   }
 };
 
-// ---------------------- VERIFY PIN ----------------------
 const verifyPin = async (req, res) => {
   try {
     const { email, securityKey } = req.body;
@@ -114,7 +110,6 @@ const verifyPin = async (req, res) => {
   }
 };
 
-// ---------------------- RESET PASSWORD USING PIN ----------------------
 const resetPasswordWithPin = async (req, res) => {
   try {
     const { email, securityKey, newPassword } = req.body;
