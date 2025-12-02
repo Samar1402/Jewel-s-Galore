@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import AdminLayout from "./AdminLayout"; // Assumed layout component
-import { useAuth } from "../Context/AuthContext"; // Assumed context hook
-import { authFetch } from "../utils/api"; // Assumed API utility
-import { Link } from 'react-router-dom'; // Assuming you use React Router for linking
+import AdminLayout from "./AdminLayout";
+import { useAuth } from "../Context/AuthContext"; 
+import { authFetch } from "../utils/api"; 
+import { Link } from 'react-router-dom'; 
 
 import { 
     FaBoxes, 
@@ -14,7 +14,6 @@ import {
     FaMoneyBillWave 
 } from 'react-icons/fa';
 
-// Utility function to format currency for Indian Rupees
 const formatCurrency = (amount) => {
     const numericAmount = Number(amount) || 0; 
     return `₹${numericAmount.toLocaleString('en-IN')}`;
@@ -23,13 +22,13 @@ const formatCurrency = (amount) => {
 const AdminDashboard = () => {
     const { user } = useAuth();
     const [stats, setStats] = useState({
-        totalOrders: 0, // Now mapped to PENDING count
+        totalOrders: 0, 
         confirmed: 0,
         dispatched: 0,
         delivered: 0,
         overallRevenue: 0,
         deliveredRevenue: 0,
-        processingRevenue: 0 // Now mapped to CONFIRMED revenue
+        processingRevenue: 0 
     });
     const [loading, setLoading] = useState(true);
 
@@ -42,8 +41,6 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const res = await authFetch("/api/dashboard/order-stats", {}, user.token);
-
-            // Access the nested 'data' property from the API response
             if (res.ok && res.data && res.data.data) {
                 setStats(res.data.data);
             }
@@ -68,10 +65,10 @@ const AdminDashboard = () => {
     }
 
     const orderCountCards = [
-        { title: "Total Request", value: stats.totalOrders, icon: <FaBoxes className="text-4xl" />, color: "text-blue-500", border: "border-blue-500", link: '/admin/orders/requests' },
-        { title: "Total Confirmed", value: stats.confirmed, icon: <FaClipboardCheck className="text-4xl" />, color: "text-yellow-600", border: "border-yellow-600", link: '/admin/orders/processing' },
-        { title: "Total Dispatched", value: stats.dispatched, icon: <FaShippingFast className="text-4xl" />, color: "text-purple-600", border: "border-purple-600", link: '/admin/orders/dispatch' },
-        { title: "Total Delivered", value: stats.delivered, icon: <FaCheckCircle className="text-4xl" />, color: "text-green-600", border: "border-green-600", link: '/admin/orders/delivered' },
+        { title: "Total Order Request", value: stats.totalOrders, icon: <FaBoxes className="text-4xl" />, color: "text-blue-500", border: "border-blue-500", link: '/admin/orders/requests' },
+        { title: "Total Order Confirmed", value: stats.confirmed, icon: <FaClipboardCheck className="text-4xl" />, color: "text-yellow-600", border: "border-yellow-600", link: '/admin/orders/processing' },
+        { title: "Total Order Dispatched", value: stats.dispatched, icon: <FaShippingFast className="text-4xl" />, color: "text-purple-600", border: "border-purple-600", link: '/admin/orders/dispatch' },
+        { title: "Total Order Delivered", value: stats.delivered, icon: <FaCheckCircle className="text-4xl" />, color: "text-green-600", border: "border-green-600", link: '/admin/orders/delivered' },
     ];
 
     const revenueCards = [
