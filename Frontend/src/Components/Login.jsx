@@ -95,7 +95,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                autocomplete="current-password" 
+                autoComplete="current-password" 
                 className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 focus:ring-[#b8860b] focus:border-[#b8860b] transition duration-150"
               />
               <button
