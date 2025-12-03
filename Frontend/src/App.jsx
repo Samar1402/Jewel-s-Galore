@@ -28,6 +28,8 @@ import Address from "./pages/Address";
 import AdminDashboard from "./admin/Layout/AdminDashboard";
 import AdminProfile from "./admin/Layout/AdminProfile";
 import AdminReports from "./admin/Layout/AdminReport.jsx";
+import AdminProductForm from "./admin/Products/AdminProductForm.jsx";
+import AdminProductList from "./admin/Products/AdminProductList.jsx";
 
 // Admin Order Workflow Views
 import OrderRequests from "./admin/Orders/OrderRequests";         
@@ -46,6 +48,8 @@ const AppContent = () => {
   const adminPaths = [
     "/adminDashboard", 
     "/admin/profile",
+    "/admin/products/add",
+    "/admin/products/all",
     "/admin/orders",
     "/admin/orders/processing", 
     "/admin/orders/dispatch",
@@ -101,6 +105,8 @@ const AppContent = () => {
         )}
         <Route path="admin/reports" element={<AdminReports />} />
         <Route path="admin/analytics" element={<AnalyticsPage />} />
+        <Route path="admin/products/add" element={<AdminProductForm />} />
+        <Route path="admin/products/all" element={<AdminProductList />} />
       </Routes>
 
       {/* Footer */}
