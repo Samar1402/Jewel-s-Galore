@@ -24,9 +24,9 @@ import Profile from "./pages/Profile";
 import Address from "./pages/Address";
 
 // Admin Pages
-import AdminDashboard from "./admin/Layout/AdminDashboard";
-import AdminProfile from "./admin/Layout/AdminProfile";
-import AdminReports from "./admin/Layout/AdminReport.jsx";
+import AdminDashboard from "./admin/AdminLayout/AdminDashboard";
+import AdminProfile from "./admin/AdminLayout/AdminProfile";
+import AdminReports from "./admin/AdminLayout/AdminReport.jsx";
 import AdminProductForm from "./admin/Products/AdminProductForm.jsx";
 import AdminProductList from "./admin/Products/AdminProductList.jsx";
 
@@ -35,7 +35,7 @@ import OrderRequests from "./admin/Orders/OrderRequests";        
 import OrderProcessing from "./admin/Orders/OrderProcessing";     
 import OrderDispatch from "./admin/Orders/OrderDispatch.jsx";
 import OrderDelivered from "./admin/Orders/OrderDelivered.jsx";
-import AnalyticsPage from "./admin/Layout/AnalyticsPage.jsx";
+import AnalyticsPage from "./admin/AdminLayout/AnalyticsPage.jsx";
 
 
 const AppContent = () => {

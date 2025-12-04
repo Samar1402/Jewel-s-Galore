@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import AdminLayout from '../Layout/AdminLayout';
+import AdminLayout from '../AdminLayout/AdminLayout';
 import { FaBox, FaTag, FaImage, FaCheckCircle, FaExclamationCircle, FaRupeeSign } from 'react-icons/fa';
 
 function AdminProductForm() {

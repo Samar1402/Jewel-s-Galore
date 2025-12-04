@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import AdminLayout from '../Layout/AdminLayout';
+import AdminLayout from '../AdminLayout/AdminLayout';
 import { FaBoxes, FaEdit, FaTrash, FaSpinner, FaPlusCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { NavLink, useNavigate } from 'react-router-dom';
 
