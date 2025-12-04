@@ -10,13 +10,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user === null) {
-      navigate("/", { replace: true }); // Not logged in
-    } else if (user.role === "admin") { // <-- ADMIN REDIRECTION LOGIC
+      navigate("/", { replace: true });
+    } else if (user.role === "admin") { 
       navigate("/adminDashboard", { replace: true });
     }
   }, [user, navigate]);
 
- if (!user || user.role === "admin") { // <-- RENDER GUARD
+ if (!user || user.role === "admin") { 
     return null; 
   }
  

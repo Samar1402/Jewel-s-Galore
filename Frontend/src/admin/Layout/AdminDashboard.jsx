@@ -57,7 +57,7 @@ const AdminDashboard = () => {
             return;
         }
         
-        if (user.role !== "admin") { // <-- NON-ADMIN REDIRECTION LOGIC
+        if (user.role !== "admin") { 
             navigate("/dashboard", { replace: true });
             return;
         }
@@ -65,7 +65,7 @@ const AdminDashboard = () => {
         fetchOrderStats();
     }, [user, navigate]); 
 
-    if (!user || user.role !== "admin") { // <-- RENDER GUARD
+    if (!user || user.role !== "admin") { 
         return null;
     }
 

@@ -4,7 +4,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // <-- NEW: Loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem("user");
@@ -12,7 +12,6 @@ export const AuthProvider = ({ children }) => {
         try { 
             const userData = JSON.parse(saved);
             setUser(userData);
-            // Re-set token for consistent utility functions 
             if (userData.token || userData.jwtToken) {
                  localStorage.setItem("token", userData.token || userData.jwtToken);
             }
@@ -22,7 +21,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem("token");
         }
     }
-    setIsLoading(false); // <-- Set to false only after checking localStorage
+    setIsLoading(false); 
   }, []);
 
   const login = (userData) => {

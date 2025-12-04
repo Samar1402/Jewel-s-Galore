@@ -1,8 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { FaSpinner } from 'react-icons/fa'; // Import spinner for loading screen
-
-// Context (assuming your AuthContext is imported correctly)
+import { FaSpinner } from 'react-icons/fa'; 
 import { useAuth } from "./Context/AuthContext"; 
 
 // Components
@@ -41,13 +39,11 @@ import AnalyticsPage from "./admin/Layout/AnalyticsPage.jsx";
 
 
 const AppContent = () => {
-  // Get user and the new isLoading state
   const { user, isLoading } = useAuth(); 
   const location = useLocation();
 
   const isAdmin = user?.role === "admin";
 
-  // NEW: Display loading screen while state is initializing
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
