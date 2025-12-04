@@ -7,7 +7,6 @@ import {
     FaChevronDown,
     FaChevronUp,
     FaSignOutAlt,
-    FaChartLine,
     FaFileAlt,
     FaBoxes,
     FaPlusCircle, 
