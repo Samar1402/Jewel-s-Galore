@@ -31,7 +31,6 @@ const OrderHistory = () => {
     useEffect(() => {
         const load = async () => {
             if (!user) { setLoading(false); return; }
-            // Assuming the API response structure is correct
             const res = await authFetch("/api/orders/my-orders", {}, user.token); 
             if (res.ok) setOrders(res.data.orders || res.data || []);
             else setOrders([]);
@@ -96,7 +95,6 @@ const OrderHistory = () => {
                                     )}
                                 </div>
                                 
-                                {/* ⭐ MODIFIED TRACKING BLOCK ⭐ */}
                                 {(order.status === 'Dispatched' || order.status === 'Processing') && order.deliveryBoyName && order.deliveryBoyContact && (
                                     <div className="mt-3 bg-blue-50 text-blue-800 text-xs p-3 rounded-lg border border-blue-200">
                                         <p className="font-bold flex items-center gap-1 mb-2 text-base">
@@ -116,7 +114,6 @@ const OrderHistory = () => {
                                         </div>
                                     </div>
                                 )}
-                                {/* ⭐ END MODIFIED TRACKING BLOCK ⭐ */}
 
                                 <div className="mt-3 border-t pt-3">
                                     <button 
