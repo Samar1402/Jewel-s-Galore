@@ -39,11 +39,9 @@ import OrderDispatch from "./admin/Orders/OrderDispatch.jsx";
 import OrderDelivered from "./admin/Orders/OrderDelivered.jsx";
 import AnalyticsPage from "./admin/AdminLayout/AnalyticsPage.jsx";
 
-// --- START: Inline PrivateRoute Component (User Login Check) ---
 const PrivateRoute = () => {
     const { user, isLoading } = useAuth();
     
-    // 1. Show loading state
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -53,19 +51,13 @@ const PrivateRoute = () => {
         );
     }
 
-    // Check if the user object exists (i.e., they are logged in)
     const isAuthenticated = !!user;
 
     if (isAuthenticated) {
         return <Outlet />;
     }
-
-    // Redirect to login page, saving the original path to redirect back after login
     return <Navigate to="/login" replace />; 
 };
-// --- END: Inline PrivateRoute Component ---
-
-// --- START: Inline AdminRoute Component (Admin Role Check) ---
 const AdminRoute = () => {
     const { user, isLoading } = useAuth();
     
@@ -83,11 +75,8 @@ const AdminRoute = () => {
     if (isAdmin) {
         return <Outlet />;
     }
-
-    // If not admin, redirect to the Home page
     return <Navigate to="/" replace />; 
 };
-// --- END: Inline AdminRoute Component ---
 
 
 const AppContent = () => {
@@ -107,7 +96,6 @@ const AppContent = () => {
 
     const adminPaths = [
         "/adminDashboard", 
-        // ... (remaining admin paths)
         "/admin/profile",
         "/admin/products/add",
         "/admin/products/all",
@@ -125,11 +113,9 @@ const AppContent = () => {
 
     return (
         <>
-            {/* Header */}
             {!shouldHideNav && <Header />}
 
             <Routes>
-                {/* Public Routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="about" element={<About />} />
                 <Route path="products" element={<Products />} />
@@ -140,12 +126,8 @@ const AppContent = () => {
                 <Route path="refund" element={<RefundPolicy />} />
                 <Route path="faq" element={<FAQ />} />
                 
-                {/* 🛑 USER PROTECTED ROUTES (Including Cart) 🛑 */}
                 <Route element={<PrivateRoute />}>
-                    {/* Cart is now protected */}
                     <Route path="cart" element={<Cart />} />
-
-                    {/* All User Pages are now protected */}
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="profile" element={<Profile />} />
                     <Route 
@@ -154,9 +136,7 @@ const AppContent = () => {
                     />
                     <Route path="address" element={<Address />} />
                 </Route>
-                {/* 🛑 END USER PROTECTED ROUTES 🛑 */}
 
-                {/* 🛑 ADMIN PROTECTED ROUTES - Wrapped by AdminRoute 🛑 */}
                 <Route element={<AdminRoute />}>
                     <Route path="adminDashboard" element={<AdminDashboard />} />
                     <Route path="admin/profile" element={<AdminProfile />} />
@@ -168,10 +148,8 @@ const AppContent = () => {
                     <Route path="admin/products/add" element={<AdminProductForm />} />
                     <Route path="admin/products/all" element={<AdminProductList />} />
                 </Route>
-                {/* 🛑 END ADMIN PROTECTED ROUTES 🛑 */}
             </Routes>
 
-            {/* Footer */}
             {!shouldHideNav && <Footer />}
         </>
     );
