@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { useCart } from "../Components/CartContext";
+import UserLayout from "../Layout/UserLayout"; 
 
 function Products() {
     const navigate = useNavigate();
@@ -14,6 +15,7 @@ function Products() {
     const [error, setError] = useState(null);
 
     const BASE_HOST = import.meta.env.VITE_API_URL;
+
     const categoriesOrder = useMemo(() => ([
         "pendant",
         "rings",
@@ -34,7 +36,6 @@ function Products() {
         const loadProducts = async () => {
             try {
                 const apiPath = `${BASE_HOST}/api/products`;
-                
                 const res = await axios.get(apiPath);
                 const parsedData = res.data.map(product => ({
                     ...product,
@@ -65,6 +66,7 @@ function Products() {
             navigate("/login");
             return;
         }
+        
         addToCart({
             id: item._id, 
             name: item.name,
@@ -93,40 +95,38 @@ function Products() {
     const ProductCard = ({ item }) => {
         const id = item._id; 
         const quantity = getQuantity(id);
+        const imageUrl = `${BASE_HOST}${item.imageUrl}`;
         
         return (
             <div
                 key={id}
-                className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border hover:shadow-md transition"
+                className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition duration-200"
             >
-                {/* Image */}
                 <img
-                    src={`${BASE_HOST}${item.imageUrl}`}
+                    src={imageUrl}
                     alt={item.name}
-                    className="w-20 h-20 object-cover rounded-lg"
+                    className="w-20 h-20 object-cover rounded-lg shadow-sm"
                 />
 
-                {/* Name + Price */}
-                <div className="flex-1 ml-4">
-                    <p className="font-semibold">{item.name}</p>
-                    <p className="text-yellow-600 font-semibold">
-                        ₹{item.price}
+                <div className="flex-1 ml-4 overflow-hidden">
+                    <p className="font-semibold text-gray-800 truncate">{item.name}</p>
+                    <p className="text-[#b8860b] font-bold mt-1 text-lg">
+                        ₹{item.price.toLocaleString()}
                     </p>
                 </div>
 
-                {/* Qty Buttons */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-[120px] justify-end">
                     <button
                         onClick={() => handleDecrease(id)}
-                        className="px-3 py-1 bg-gray-200 rounded-lg disabled:opacity-50"
+                        className="w-8 h-8 bg-gray-200 text-gray-700 rounded-full flex items-center justify-center hover:bg-gray-300 disabled:opacity-50 transition"
                         disabled={quantity === 0}
                     >
                         -
                     </button>
-                    <span className="font-semibold w-6 text-center">{quantity}</span>
+                    <span className="font-bold w-6 text-center text-lg">{quantity}</span>
                     <button
                         onClick={() => handleIncrease(item)}
-                        className="px-3 py-1 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+                        className="w-8 h-8 bg-[#b8860b] text-white rounded-full flex items-center justify-center hover:bg-[#a3790a] transition shadow-md"
                     >
                         +
                     </button>
@@ -135,9 +135,9 @@ function Products() {
         );
     };
 
-    return (
-        <div className="p-6 md:p-12">
-            <h1 className="text-4xl font-extrabold text-[#d4af37] text-center mb-16">
+    const content = (
+        <div className="p-6 md:p-12 max-w-5xl mx-auto bg-white min-h-screen">
+            <h1 className="text-4xl font-extrabold text-gray-800 text-center mb-16">
                 ✨ All Jewelry Products
             </h1>
             
@@ -158,11 +158,11 @@ function Products() {
                     (group) =>
                         group.items.length > 0 && (
                             <div key={group.category} className="mb-12">
-                                <h2 className="text-3xl font-semibold text-gray-800 mb-6 border-b-2 border-gray-300 pb-2">
+                                <h2 className="text-3xl font-bold text-[#b8860b] mb-6 border-b-2 border-gray-200 pb-2">
                                     {categoryTitles[group.category]}
                                 </h2>
 
-                                <div className="flex flex-col gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     {group.items.map((item) => (
                                         <ProductCard key={item._id} item={item} />
                                     ))}
@@ -173,12 +173,14 @@ function Products() {
             )}
             
             {!loading && !error && products.length === 0 && (
-                 <p className="text-center text-xl text-gray-500 mt-20">
+                <p className="text-center text-xl text-gray-500 mt-20">
                     No products found in the database.
                 </p>
             )}
         </div>
     );
+
+    return user ? <UserLayout>{content}</UserLayout> : content;
 }
 
 export default Products;

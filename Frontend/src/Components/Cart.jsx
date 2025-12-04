@@ -4,7 +4,7 @@ import { useAuth } from "../Context/AuthContext";
 import { useCart } from "../Components/CartContext";
 import { authFetch } from "../utils/api";
 import axios from "axios"; 
-import { FaEdit, FaPlus, FaHome, FaMapMarkedAlt, FaGlobe } from "react-icons/fa";
+import { FaEdit, FaPlus, FaHome } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom'; 
 
 const Cart = () => {
@@ -24,7 +24,6 @@ const Cart = () => {
 
     const fetchAddress = async () => {
       try {
-        // Fetches the user's primary address from the address collection
         const res = await axios.get(`${API_URL}/${user._id}`);
         if (res.data) {
           setAddress(res.data);
@@ -88,6 +87,7 @@ const Cart = () => {
         name: item.name,
         qty: item.quantity,
         price: item.price,
+        image: item.image,
       })),
       totalAmount: totalPrice,
       deliveryAddress: address, 

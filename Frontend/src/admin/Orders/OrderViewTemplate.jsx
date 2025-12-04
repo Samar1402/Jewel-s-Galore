@@ -42,15 +42,21 @@ const OrderViewTemplate = ({ status, pageTitle }) => {
         }
         setLoading(true);
         const urlSegment = statusToUrl[status];
+        
+        try {
+            const res = await authFetch(`/api/orders/${urlSegment}`, {}, user.token);
 
-        const res = await authFetch(`/api/orders/${urlSegment}`, {}, user.token);
-
-        if (res.ok) {
-            setOrders(res.data.data); 
-        } else {
-            console.error(`Failed to fetch ${status} orders:`, res);
-            alert(`Failed to fetch ${status} orders. Check admin token.`);
-            setOrders([]);
+            if (res.ok) {
+                setOrders(res.data.data); 
+            } else {
+                console.error(`Failed to fetch ${status} orders:`, res.data || res);
+                alert(`Failed to fetch ${status} orders. Check admin token.`);
+                setOrders([]);
+            }
+        } catch (error) {
+             console.error(`Network error fetching ${status} orders:`, error);
+             alert(`Network error: Failed to connect to server.`);
+             setOrders([]);
         }
         setLoading(false);
     };
@@ -60,6 +66,10 @@ const OrderViewTemplate = ({ status, pageTitle }) => {
     }, [user, status]);
 
     const handleDispatchInputChange = (orderId, field, value) => {
+        if (field === 'contact' && value && !/^\d*$/.test(value)) {
+            return; 
+        }
+
         setDispatchData(prev => ({
             ...prev,
             [orderId]: {
@@ -121,7 +131,8 @@ const OrderViewTemplate = ({ status, pageTitle }) => {
     };
 
     if (loading) return <AdminLayout><div className="p-6">Loading orders...</div></AdminLayout>;
-    if (user.role !== 'admin') return <AdminLayout><div className="p-6 text-red-500">Access Denied.</div></AdminLayout>;
+    if (user && user.role !== 'admin') return <AdminLayout><div className="p-6 text-red-500">Access Denied.</div></AdminLayout>;
+    if (!user) return <AdminLayout><div className="p-6 text-red-500">Please log in as an administrator.</div></AdminLayout>;
 
     return (
         <AdminLayout>
@@ -144,7 +155,7 @@ const OrderViewTemplate = ({ status, pageTitle }) => {
                                 
                                 <div className="flex justify-between items-start mb-4 pb-4 border-b border-dashed">
                                     <div>
-                                        <h3 className="font-bold text-xl text-gray-800 mb-1">Order ID: #{order._id.slice(-8).toUpperCase()}</h3>
+                                        <h3 className="font-bold text-xl text-gray-800 mb-1">Order ID: <span className="text-gray-500">#{order._id.slice(-8).toUpperCase()}</span></h3>
                                         <p className="font-bold text-[#b8860b] text-2xl">Total: ₹{order.totalAmount}</p>
                                     </div>
                                     <div className="flex flex-col items-end space-y-3">
@@ -167,6 +178,7 @@ const OrderViewTemplate = ({ status, pageTitle }) => {
                                         </div>
                                     </div>
                                 </div>
+                                
                                 {status === 'Confirmed' && (
                                     <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                                         <h4 className="font-bold text-yellow-800 mb-2">Prepare for Dispatch:</h4>
@@ -204,6 +216,7 @@ const OrderViewTemplate = ({ status, pageTitle }) => {
                                 
                                 {isDetailsOpen && (
                                     <div className="pt-4 mt-4 border-t space-y-4">
+                                        
                                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                             <h4 className="font-bold flex items-center gap-2 text-gray-700 mb-2 border-b pb-1">
                                                 <FaMapMarkerAlt className="text-red-500" /> Shipping Address
@@ -220,17 +233,28 @@ const OrderViewTemplate = ({ status, pageTitle }) => {
                                                 <FaCalendarAlt className='text-xs' /> Order Date: {new Date(order.createdAt).toLocaleString()}
                                             </p>
                                         </div>
+                                        
                                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                             <h4 className="font-bold flex items-center gap-2 text-gray-700 mb-2 border-b pb-1">
                                                 <FaBoxOpen className="text-blue-500" /> Ordered Items ({order.items.length})
                                             </h4>
                                             {order.items.map((item, index) => (
-                                                <div key={index} className="flex justify-between text-sm py-1 border-b border-gray-200 last:border-b-0 pl-6">
-                                                    <span>{item.name}</span>
-                                                    <span className="font-medium">{item.qty} pcs @ ₹{item.price}</span>
+                                                <div key={index} className="flex justify-between items-center text-sm py-2 border-b border-gray-200 last:border-b-0 pl-6">
+                                                    <div className='flex items-center gap-3'>
+                                                        {item.image && (
+                                                            <img
+                                                                src={item.image}
+                                                                alt={item.name}
+                                                                className="w-10 h-10 object-cover rounded-md shadow-sm border"
+                                                            />
+                                                        )}
+                                                        <span className='font-medium text-gray-700'>{item.name}</span>
+                                                    </div>
+                                                    <span className="font-medium text-gray-600">{item.qty} pcs @ ₹{item.price}</span>
                                                 </div>
                                             ))}
                                         </div>
+                                        
                                         {order.deliveryBoyName && status === 'Dispatched' && ( 
                                             <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                                                 <h4 className="font-bold text-sm text-green-700 mb-2">Delivery Agent Details:</h4>
@@ -242,6 +266,7 @@ const OrderViewTemplate = ({ status, pageTitle }) => {
                                                 </p>
                                             </div>
                                         )}
+                                        
                                         {status === 'Delivered' && ( 
                                             <div className="bg-green-100 p-4 rounded-lg border border-green-400">
                                                 <h4 className="font-bold text-green-800 flex items-center gap-2">
@@ -253,7 +278,7 @@ const OrderViewTemplate = ({ status, pageTitle }) => {
                                     </div>
                                 )}
                             </div>
-                        )})}
+                            )})}
                     </div>
                 )}
             </div>

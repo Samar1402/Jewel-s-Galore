@@ -3,6 +3,7 @@ import UserLayout from "../Layout/UserLayout";
 import { useAuth } from "../Context/AuthContext"; 
 import { authFetch } from "../utils/api"; 
 import { FaMapMarkerAlt, FaHome, FaUserTie, FaPhone } from 'react-icons/fa'; 
+import { Link } from 'react-router-dom'; 
 
 const getStatusClasses = (status) => {
     switch (status) {
@@ -59,12 +60,18 @@ const OrderHistory = () => {
         setOpenOrderId(orderId === openOrderId ? null : orderId);
     };
 
+    const createProductSlug = (name) => {
+        if (!name) return '#';
+        return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    };
+
     return (
         <UserLayout>
             <div className="p-6 w-full min-h-screen bg-gray-50">
                 <h1 className="text-3xl font-bold mb-6 text-gray-800">📦 My Orders</h1>
-
-                {loading ? <p className="text-center py-10 text-lg text-gray-600">Loading order history...</p> : orders.length === 0 ? (
+                {loading ? (
+                    <p className="text-center py-10 text-lg text-gray-600">Loading order history...</p>
+                ) : orders.length === 0 ? (
                     <div className="text-center py-20 bg-white rounded-xl shadow">
                         <p className="text-xl text-gray-600">You have no orders yet.</p>
                         <p className="text-lg text-[#b8860b] mt-4">Time to start shopping!</p>
@@ -88,6 +95,7 @@ const OrderHistory = () => {
                                         <span className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</span>
                                     </div>
                                 </div>
+
                                 <p className="mb-3 text-sm flex items-center gap-2">
                                     <span className="font-medium text-gray-500">Status:</span>
                                     <span 
@@ -102,14 +110,12 @@ const OrderHistory = () => {
                                         <FaMapMarkerAlt /> Shipping To
                                     </h4>
                                     {order.deliveryAddress ? (
-                                        <>
-                                            <p className="pl-5 flex items-start">
-                                                <FaHome className="text-[#b8860b] mr-2 mt-0.5" /> 
-                                                <span className="leading-tight">
-                                                    {order.deliveryAddress.street}, {order.deliveryAddress.city}, {order.deliveryAddress.state} - {order.deliveryAddress.pincode}, {order.deliveryAddress.country}
-                                                </span>
-                                            </p>
-                                        </>
+                                        <p className="pl-5 flex items-start">
+                                            <FaHome className="text-[#b8860b] mr-2 mt-0.5" /> 
+                                            <span className="leading-tight">
+                                                {order.deliveryAddress.street}, {order.deliveryAddress.city}, {order.deliveryAddress.state} - {order.deliveryAddress.pincode}, {order.deliveryAddress.country}
+                                            </span>
+                                        </p>
                                     ) : (
                                         <p className="pl-5 text-red-500">Address not recorded.</p>
                                     )}
@@ -134,7 +140,6 @@ const OrderHistory = () => {
                                         </div>
                                     </div>
                                 )}
-
                                 <div className="mt-3 border-t pt-3">
                                     <button 
                                         className="w-full text-left font-semibold text-sm mb-1 flex justify-between items-center text-gray-700 hover:text-gray-900"
@@ -149,8 +154,21 @@ const OrderHistory = () => {
                                     {order._id === openOrderId && (
                                         <div className="space-y-1 mt-2 p-2 bg-gray-50 rounded-md">
                                             {order.items.map((it, i) => (
-                                                <div key={i} className="flex justify-between py-0.5 text-sm">
-                                                    <span>{it.name}</span>
+                                                <div key={i} className="flex justify-between items-center py-1 text-sm border-b last:border-b-0">
+                                                 <Link 
+                                                        to={`/products`} 
+                                                        className="flex items-center gap-2 text-gray-800 hover:text-[#b8860b] transition-colors duration-150"
+                                                    >
+                                                        {it.image && (
+                                                            <img
+                                                                src={it.image}
+                                                                alt={it.name}
+                                                                className="w-8 h-8 object-cover rounded shadow-sm"
+                                                            />
+                                                        )}
+                                                        <span className="font-medium">{it.name}</span>
+                                                    </Link>
+                                                    
                                                     <span className="font-medium text-gray-600">{it.qty} × ₹{it.price}</span>
                                                 </div>
                                             ))}
