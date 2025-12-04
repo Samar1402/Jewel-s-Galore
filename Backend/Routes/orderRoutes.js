@@ -3,24 +3,28 @@ const router = express.Router();
 const { 
     createOrder, 
     getMyOrders, 
+    getAllOrdersForAdmin, 
     getOrderRequests, 
     getOrderProcessing, 
     getOrderDispatch, 
     getOrderDelivered, 
     updateOrderStatus 
-} = require("../Controllers/orderController");
+} = require("../Controllers/orderController"); 
+
 const AuthMiddleware = require("../Middlewares/AuthMiddleware");
+const AdminMiddleware = require("../Middlewares/AdminMiddleware"); 
 
 
-router.post("/", AuthMiddleware, createOrder);
+router.post("/", AuthMiddleware, createOrder); 
 router.get("/my-orders", AuthMiddleware, getMyOrders);
 
-router.get("/requests", AuthMiddleware, getOrderRequests);             
-router.get("/processing", AuthMiddleware, getOrderProcessing);         
-router.get("/dispatch", AuthMiddleware, getOrderDispatch);             
-router.get("/delivered", AuthMiddleware, getOrderDelivered);           
+router.get("/admin", AuthMiddleware, AdminMiddleware, getAllOrdersForAdmin);
 
+router.get("/requests", AuthMiddleware, AdminMiddleware, getOrderRequests);             
+router.get("/processing", AuthMiddleware, AdminMiddleware, getOrderProcessing);         
+router.get("/dispatch", AuthMiddleware, AdminMiddleware, getOrderDispatch);             
+router.get("/delivered", AuthMiddleware, AdminMiddleware, getOrderDelivered);           
 
-router.put("/update-status/:id", AuthMiddleware, updateOrderStatus);
+router.put("/update-status/:id", AuthMiddleware, AdminMiddleware, updateOrderStatus);
 
 module.exports = router;

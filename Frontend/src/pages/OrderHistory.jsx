@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import UserLayout from "../Layout/UserLayout";
-import { useAuth } from "../Context/AuthContext";
-import { authFetch } from "../utils/api";
-import { FaMapMarkerAlt, FaHome, FaUserTie, FaPhone, FaRoute } from 'react-icons/fa'; // Added FaUserTie and FaPhone
+import { useAuth } from "../Context/AuthContext"; 
+import { authFetch } from "../utils/api"; 
+import { FaMapMarkerAlt, FaHome, FaUserTie, FaPhone } from 'react-icons/fa'; 
 
 const getStatusClasses = (status) => {
     switch (status) {
@@ -29,25 +29,45 @@ const OrderHistory = () => {
     const [openOrderId, setOpenOrderId] = useState(null);
 
     useEffect(() => {
-        const load = async () => {
-            if (!user) { setLoading(false); return; }
-            const res = await authFetch("/api/orders/my-orders", {}, user.token); 
-            if (res.ok) setOrders(res.data.orders || res.data || []);
-            else setOrders([]);
+        const loadOrders = async () => {
+            if (!user) { 
+                setLoading(false); 
+                return; 
+            }
+            
+            try {
+                const res = await authFetch("/api/orders/my-orders", {}, user.token); 
+                
+                if (res.ok) {
+                    const orderArray = res.data.data || []; 
+                    setOrders(orderArray);
+                } else {
+                    console.error("Failed to fetch orders:", res.data.message || res.data);
+                    setOrders([]);
+                }
+            } catch (error) {
+                console.error("API call failed:", error);
+                setOrders([]);
+            }
+            
             setLoading(false);
         };
-        load();
-    }, [user]);
+        loadOrders();
+    }, [user]); 
+
+    const toggleAccordion = (orderId) => {
+        setOpenOrderId(orderId === openOrderId ? null : orderId);
+    };
 
     return (
         <UserLayout>
-            <div className="p-6 w-full">
-                <h1 className="text-3xl font-bold mb-6">📦 My Orders</h1>
+            <div className="p-6 w-full min-h-screen bg-gray-50">
+                <h1 className="text-3xl font-bold mb-6 text-gray-800">📦 My Orders</h1>
 
-                {loading ? <p>Loading...</p> : orders.length === 0 ? (
-                    <div className="text-center py-20">
-                        <p className="text-lg text-gray-600">You have no orders yet.</p>
-                        <p className="text-[#b8860b] mt-4">Start shopping!</p>
+                {loading ? <p className="text-center py-10 text-lg text-gray-600">Loading order history...</p> : orders.length === 0 ? (
+                    <div className="text-center py-20 bg-white rounded-xl shadow">
+                        <p className="text-xl text-gray-600">You have no orders yet.</p>
+                        <p className="text-lg text-[#b8860b] mt-4">Time to start shopping!</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -95,7 +115,7 @@ const OrderHistory = () => {
                                     )}
                                 </div>
                                 
-                                {(order.status === 'Dispatched' || order.status === 'Processing') && order.deliveryBoyName && order.deliveryBoyContact && (
+                                {['Dispatched', 'Confirmed', 'Processing'].includes(order.status) && order.deliveryBoyName && order.deliveryBoyContact && (
                                     <div className="mt-3 bg-blue-50 text-blue-800 text-xs p-3 rounded-lg border border-blue-200">
                                         <p className="font-bold flex items-center gap-1 mb-2 text-base">
                                             <FaUserTie className="text-lg" /> Delivery Agent
@@ -118,7 +138,7 @@ const OrderHistory = () => {
                                 <div className="mt-3 border-t pt-3">
                                     <button 
                                         className="w-full text-left font-semibold text-sm mb-1 flex justify-between items-center text-gray-700 hover:text-gray-900"
-                                        onClick={() => setOpenOrderId(order._id === openOrderId ? null : order._id)}
+                                        onClick={() => toggleAccordion(order._id)}
                                     >
                                         <span>Items ({order.items.length} product{order.items.length > 1 ? 's' : ''})</span> 
                                         <span className="text-lg transition-transform duration-300">
@@ -127,7 +147,7 @@ const OrderHistory = () => {
                                     </button>
                                     
                                     {order._id === openOrderId && (
-                                        <div className="space-y-1 mt-2">
+                                        <div className="space-y-1 mt-2 p-2 bg-gray-50 rounded-md">
                                             {order.items.map((it, i) => (
                                                 <div key={i} className="flex justify-between py-0.5 text-sm">
                                                     <span>{it.name}</span>
@@ -138,7 +158,7 @@ const OrderHistory = () => {
                                     )}
                                 </div>
                                 
-                                <div className="mt-3 pt-3 border-t font-bold text-lg text-[#b8860b]">Total: ₹{order.totalAmount}</div>
+                                <div className="mt-3 pt-3 border-t font-bold text-xl text-[#b8860b]">Total: ₹{order.totalAmount}</div>
                             </div>
                         ))}
                     </div>

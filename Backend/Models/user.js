@@ -23,14 +23,13 @@ const UserSchema = new Schema({
         type: String,
         default: "", 
     },
-    // CRITICAL ADDITION: Define the role field
     role: {
         type: String,
         required: true,
-        default: 'user', // Default for public sign-ups
+        default: 'user', 
         enum: ['user', 'admin'] 
     }
 }, { timestamps: true });
 
-const UserModel = mongoose.model('user', UserSchema); 
+const UserModel = mongoose.model('User', UserSchema); 
 module.exports = UserModel;

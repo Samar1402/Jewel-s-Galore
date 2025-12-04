@@ -46,7 +46,7 @@ const OrderViewTemplate = ({ status, pageTitle }) => {
         const res = await authFetch(`/api/orders/${urlSegment}`, {}, user.token);
 
         if (res.ok) {
-            setOrders(res.data.orders);
+            setOrders(res.data.data); 
         } else {
             console.error(`Failed to fetch ${status} orders:`, res);
             alert(`Failed to fetch ${status} orders. Check admin token.`);

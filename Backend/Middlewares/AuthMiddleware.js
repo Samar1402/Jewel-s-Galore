@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
+const User = require('../Models/user'); 
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => { 
+    
     if (!process.env.JWT_SECRET) {
         console.error("❌ ERROR: JWT_SECRET is missing in .env");
         return res.status(500).json({ success: false, message: "Server misconfiguration" });
@@ -18,15 +20,23 @@ module.exports = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = {
-            id: decoded.id || decoded._id,
-            email: decoded.email,
-            role: decoded.role,
-        };
+        const userId = decoded.id || decoded._id;
+        const user = await User.findById(userId).select('-password -securityKey');
+        
+        if (!user) {
+             return res.status(401).json({ success: false, message: "Invalid token or user no longer exists." });
+        }
+        req.user = user;
 
         next();
     } catch (err) {
         console.error(`❌ JWT Verification Failed:`, err.message);
-        return res.status(401).json({ success: false, message: "Invalid or expired token" });
+        
+        let message = "Invalid or expired token";
+        if (err.name === 'TokenExpiredError') {
+             message = "Token expired. Please log in again.";
+        }
+
+        return res.status(401).json({ success: false, message: message });
     }
 };
