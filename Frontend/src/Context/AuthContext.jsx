@@ -4,9 +4,25 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // <-- NEW: Loading state
+
   useEffect(() => {
     const saved = localStorage.getItem("user");
-    if (saved) setUser(JSON.parse(saved));
+    if (saved) {
+        try { 
+            const userData = JSON.parse(saved);
+            setUser(userData);
+            // Re-set token for consistent utility functions 
+            if (userData.token || userData.jwtToken) {
+                 localStorage.setItem("token", userData.token || userData.jwtToken);
+            }
+        } catch(e) {
+            console.error("Error parsing user data:", e);
+            localStorage.removeItem("user");
+            localStorage.removeItem("token");
+        }
+    }
+    setIsLoading(false); // <-- Set to false only after checking localStorage
   }, []);
 
   const login = (userData) => {
@@ -18,12 +34,12 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    localStorage.removeItem("adminId"); 
+    localStorage.removeItem("adminId"); 
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}> {/* <-- ADDED isLoading */}
       {children}
     </AuthContext.Provider>
   );

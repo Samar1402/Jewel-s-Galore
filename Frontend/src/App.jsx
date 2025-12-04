@@ -1,8 +1,9 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { FaSpinner } from 'react-icons/fa'; // Import spinner for loading screen
 
-// Context
-import { useAuth } from "./Context/AuthContext.jsx"; 
+// Context (assuming your AuthContext is imported correctly)
+import { useAuth } from "./Context/AuthContext"; 
 
 // Components
 import Home from "./Components/Home";
@@ -40,22 +41,34 @@ import AnalyticsPage from "./admin/Layout/AnalyticsPage.jsx";
 
 
 const AppContent = () => {
-  const { user } = useAuth();
+  // Get user and the new isLoading state
+  const { user, isLoading } = useAuth(); 
   const location = useLocation();
 
   const isAdmin = user?.role === "admin";
 
+  // NEW: Display loading screen while state is initializing
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <FaSpinner className="animate-spin text-3xl text-gray-500 mr-2" />
+        <p className="text-lg text-gray-600">Loading Session...</p>
+      </div>
+    );
+  }
+
+
   const adminPaths = [
     "/adminDashboard", 
     "/admin/profile",
-    "/admin/products/add",
-    "/admin/products/all",
-    "/admin/orders",
+    "/admin/products/add",
+    "/admin/products/all",
+    "/admin/orders",
     "/admin/orders/processing", 
     "/admin/orders/dispatch",
     "/admin/orders/delivered",
-    "/admin/reports",
-    "/admin/analytics"
+    "/admin/reports",
+    "/admin/analytics"
 ];
 
   const isAdminRoute = adminPaths.some(path => location.pathname.startsWith(path)) || 
@@ -99,14 +112,14 @@ const AppContent = () => {
         {isAdmin && (
             <>
                 <Route path="admin/orders/processing" element={<OrderProcessing />} />
-                <Route path="admin/orders/dispatch" element={<OrderDispatch/>}/>
-                <Route path="admin/orders/delivered" element={<OrderDelivered/>}/>
+                <Route path="admin/orders/dispatch" element={<OrderDispatch/>}/>
+                <Route path="admin/orders/delivered" element={<OrderDelivered/>}/>
             </>
         )}
         <Route path="admin/reports" element={<AdminReports />} />
-        <Route path="admin/analytics" element={<AnalyticsPage />} />
-        <Route path="admin/products/add" element={<AdminProductForm />} />
-        <Route path="admin/products/all" element={<AdminProductList />} />
+        <Route path="admin/analytics" element={<AnalyticsPage />} />
+        <Route path="admin/products/add" element={<AdminProductForm />} />
+        <Route path="admin/products/all" element={<AdminProductList />} />
       </Routes>
 
       {/* Footer */}

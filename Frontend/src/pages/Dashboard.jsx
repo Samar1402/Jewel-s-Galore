@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"; // Added useEffect
+import React, { useEffect } from "react";
 import { useAuth } from "../Context/AuthContext";
 import UserLayout from "../Layout/UserLayout";
 import { FaUserCircle, FaShoppingCart, FaMapMarkerAlt } from "react-icons/fa";
@@ -10,11 +10,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user === null) {
-      navigate("/"); 
+      navigate("/", { replace: true }); // Not logged in
+    } else if (user.role === "admin") { // <-- ADMIN REDIRECTION LOGIC
+      navigate("/adminDashboard", { replace: true });
     }
   }, [user, navigate]);
 
- if (!user) {
+ if (!user || user.role === "admin") { // <-- RENDER GUARD
     return null; 
   }
  
