@@ -49,7 +49,7 @@ const AdminSidebar = ({ closeSidebar }) => {
         { name: "Products", icon: FaBoxes, dropdown: true }, 
         { name: "Orders", icon: FaShoppingCart, dropdown: true }, 
         { name: "Reports", path: "/admin/reports", icon: FaFileAlt },
-        { name: "Analytics", path: "/admin/analytics", icon: FaChartLine },
+        // { name: "Analytics", path: "/admin/analytics", icon: FaChartLine },
     ];
     
     const productMenu = [
@@ -106,11 +106,9 @@ const AdminSidebar = ({ closeSidebar }) => {
                                             <NavLink
                                                 key={sub.path}
                                                 to={sub.path}
-                                                // We keep the closeSidebar call here for mobile responsiveness
                                                 onClick={() => closeSidebar && closeSidebar()}
                                                 className={({ isActive }) => `${base} ${isActive ? active : inactive} block`}
                                             >
-                                                {/* Optional: Add icon to sub-menu items for better visual distinction */}
                                                 {sub.icon && <sub.icon className="mr-2 w-3 h-3" />}
                                                 {sub.name}
                                             </NavLink>
