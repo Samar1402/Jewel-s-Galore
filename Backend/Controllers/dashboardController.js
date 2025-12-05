@@ -16,6 +16,12 @@ const getDashboardStats = async (req, res) => {
             },
             
             {
+                $match: {
+                    statusUpper: { $ne: 'REJECTED' } 
+                }
+            },
+
+            {
                 $group: {
                     _id: "$statusUpper",
                     count: { $sum: 1 },
@@ -26,14 +32,22 @@ const getDashboardStats = async (req, res) => {
             {
                 $group: {
                     _id: null,
-                    totalOrdersAll: { $sum: "$count" }, 
+                    totalOrdersActive: { $sum: "$count" }, 
                     overallRevenue: { $sum: "$revenue" },
                     pending: { $sum: { $cond: [ { $eq: ["$_id", "PENDING"] }, "$count", 0 ] } },
                     confirmed: { $sum: { $cond: [ { $eq: ["$_id", "CONFIRMED"] }, "$count", 0 ] } },
                     dispatched: { $sum: { $cond: [ { $eq: ["$_id", "DISPATCHED"] }, "$count", 0 ] } },
                     delivered: { $sum: { $cond: [ { $eq: ["$_id", "DELIVERED"] }, "$count", 0 ] } },
                     deliveredRevenue: { $sum: { $cond: [ { $eq: ["$_id", "DELIVERED"] }, "$revenue", 0 ] } },
-                    processingRevenue: { $sum: { $cond: [ { $eq: ["$_id", "CONFIRMED"] }, "$revenue", 0 ] } },
+                    processingRevenue: { 
+                        $sum: { 
+                            $cond: [ 
+                                { $in: ["$_id", ["CONFIRMED", "DISPATCHED"]] }, 
+                                "$revenue", 
+                                0 
+                            ] 
+                        } 
+                    },
                 }
             },
 
